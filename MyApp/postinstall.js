@@ -10,6 +10,8 @@ const files = {
       'servicestack-client.min.mjs':     '/@servicestack/client@2/dist/servicestack-client.min.mjs',
       'servicestack-vue.mjs':            '/@servicestack/vue@3/dist/servicestack-vue.mjs',
       'servicestack-vue.min.mjs':        '/@servicestack/vue@3/dist/servicestack-vue.min.mjs',
+      'litdb.js':                        '/litdb/dist/index.js',
+      'litdb.min.js':                    '/litdb/dist/index.min.js',
   },
   typings: {
       'vue/index.d.ts':                  '/vue@3/dist/vue.d.ts',
@@ -21,6 +23,7 @@ const files = {
       '@vue/shared.d.ts':                '/@vue/shared@3/dist/shared.d.ts',
       '@servicestack/client/index.d.ts': '/@servicestack/client/dist/index.d.ts',  
       '@servicestack/vue/index.d.ts':    '/@servicestack/vue@3/dist/index.d.ts',
+      'litdb/index.d.ts':            '/litdb/dist/index.d.ts',
   }
 }
 

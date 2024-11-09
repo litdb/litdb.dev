@@ -13,7 +13,7 @@ export default {
       <small class="text-xs text-gray-400 px-3 -mt-1">sh</small>
     </div>
 
-    <div v-if="successText" class="absolute right-0 -mr-28 -mt-3 rounded-md bg-green-50 p-3">
+    <div v-if="successText" class="absolute right-0 -mr-28 -mt-3 rounded-md bg-green-50 dark:bg-green-900 p-3">
         <div class="flex">
             <div class="flex-shrink-0">
                 <svg class="h-5 w-5 text-green-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
@@ -21,7 +21,7 @@ export default {
                 </svg>
             </div>
             <div class="ml-3">
-                <p class="text-sm font-medium text-green-800">
+                <p class="text-sm font-medium text-green-800 dark:text-green-100">
                     {{ successText }}
                 </p>
             </div>
