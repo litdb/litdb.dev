@@ -24,7 +24,13 @@
     </script>
     <link rel="stylesheet" href="/css/app.css">
     <link rel="stylesheet" href="/css/typography.css">
-    @await Html.PartialAsync("VideoIncludes")
+    <link rel="stylesheet" href="/css/highlight.css">
+    <link rel="stylesheet" href="/css/lite-yt-embed.css">
+    <style>
+    .prose :where(code):not(:where([class~="not-prose"] *)) {
+        width: auto;
+    }
+    </style>
 
     @Html.ImportMap(new() {
         ["app.mjs"]              = ("/mjs/app.mjs",                     "/mjs/app.mjs"),
@@ -54,9 +60,9 @@
                 <div class="w-72" data-component="ShellCommand" data-props="{ text:'npm install litdb' }"></div>
             </div>
             
-            <p class="mx-auto mt-6 max-w-2xl text-lg tracking-tight text-slate-700 dark:text-slate-200">
-                <b>litdb</b> contains <b>type-safe</b> SQL builders for TypeScript/JavaScript that lets you write expressive <b>SQL you know</b>
-                that's <b>type-safe</b>, <b>parameterized</b> by default &amp; <b>portable</b>.
+            <p class="mx-auto mt-6 max-w-3xl text-lg tracking-tight text-slate-700 dark:text-slate-200">
+                <b>litdb</b> contains <b>type-safe</b> SQL builders for TypeScript/JavaScript for writing expressive <b>SQL you know</b>
+                that's <b>type-safe</b>, <b>parameterized</b> &amp; <b>portable</b> across SQLite, MySQL & PostgreSQL
             </p>
         </div>
 
@@ -104,21 +110,39 @@
         </div>
 
         <div class="flex justify-center py-10">
-            <div class="text-center">
-                <h1 class="text-6xl md:text-7xl lg:text-8xl font-bold tracking-tighter leading-tight md:leading-none mb-4 text-center md:text-left">
+            <div class="max-w-screen-lg">
+                <h1 class="text-6xl md:text-7xl lg:text-8xl font-bold tracking-tighter leading-tight md:leading-none mb-4 text-center">
                     Install
                 </h1>
+                <div class="prose">
+                    @await Html.PartialAsync("IncludeMarkdown", "home/install.md")
+                </div>
             </div>
         </div>
 
         <div class="flex justify-center py-10">
-            <div>
+            <div class="max-w-screen-lg">
+                <h1 class="text-6xl md:text-7xl lg:text-8xl font-bold tracking-tighter leading-tight md:leading-none mb-4 text-center">
+                    Type Safe
+                </h1>
+                <div class="mt-8 flex justify-center">
+                    <div class="prose">
+                        @await Html.PartialAsync("IncludeMarkdown", "home/typesafe.md")
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="flex justify-center py-10">
+            <div class="max-w-screen-lg">
                 <h1 class="text-6xl md:text-7xl lg:text-8xl font-bold tracking-tighter leading-tight md:leading-none mb-4 text-center">
                     Safe Refactoring
                 </h1>
-                <p class="mx-auto max-w-2xl text-lg tracking-tight text-slate-700 dark:text-slate-200">
-                    
-                </p>
+                <div class="mt-8 flex justify-center">
+                    <div class="prose">
+                        @await Html.PartialAsync("IncludeMarkdown", "home/safe-refactoring.md")
+                    </div>
+                </div>
             </div>
         </div>
 
@@ -131,6 +155,10 @@
 import { init } from "app.mjs"
 init()
 </script>
+<script src="/lib/js/lite-yt-embed.js"></script>
+<script src="/mjs/docs.mjs" type="module"></script>
+<script src="/lib/js/highlight.js"></script>
+<script>hljs.highlightAll()</script>
 
 </body>
 </html>

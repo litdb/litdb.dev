@@ -1,0 +1,14 @@
+@page
+@model string
+@inject MarkdownIncludes Markdown
+
+@{
+    Layout = "_LayoutEmpty";
+    var pages = Markdown.Pages;
+    var doc = pages.FirstOrDefault(x => x.Path == "_includes/" + Model)
+        ?? pages.FirstOrDefault(x => x.Slug == $"_includes/{Model.LeftPart('.')}");
+    if (doc?.Preview != null)
+    {
+        @Html.Raw(doc.Preview)
+    }
+}
