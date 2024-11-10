@@ -17,9 +17,13 @@
     </script>
     <link rel="stylesheet" href="/css/app.css">
     <link rel="stylesheet" href="/css/typography.css">
+    <link rel="stylesheet" href="/css/highlight.css">
     <link rel="stylesheet" href="/css/lite-yt-embed.css">
-<script src="/lib/js/lite-yt-embed.js"></script>
-
+    <style>
+    .prose :where(code):not(:where([class~="not-prose"] *)) {
+        width: auto;
+    }
+    </style>
 
     <script type="importmap">
 {
@@ -121,9 +125,9 @@ mount('#header', Header)
                 <div class="w-72" data-component="ShellCommand" data-props="{ text:'npm install litdb' }"></div>
             </div>
             
-            <p class="mx-auto mt-6 max-w-2xl text-lg tracking-tight text-slate-700 dark:text-slate-200">
-                <b>litdb</b> contains <b>type-safe</b> SQL builders for TypeScript/JavaScript that lets you write expressive <b>SQL you know</b>
-                that's <b>type-safe</b>, <b>parameterized</b> by default &amp; <b>portable</b>.
+            <p class="mx-auto mt-6 max-w-3xl text-lg tracking-tight text-slate-700 dark:text-slate-200">
+                <b>litdb</b> contains <b>type-safe</b> SQL builders for TypeScript/JavaScript for writing expressive <b>SQL you know</b>
+                that's <b>type-safe</b>, <b>parameterized</b> &amp; <b>portable</b> across SQLite, MySQL & PostgreSQL
             </p>
         </div>
 
@@ -171,21 +175,129 @@ mount('#header', Header)
         </div>
 
         <div class="flex justify-center py-10">
-            <div class="text-center">
-                <h1 class="text-6xl md:text-7xl lg:text-8xl font-bold tracking-tighter leading-tight md:leading-none mb-4 text-center md:text-left">
+            <div class="max-w-screen-lg">
+                <h1 class="text-6xl md:text-7xl lg:text-8xl font-bold tracking-tighter leading-tight md:leading-none mb-4 text-center">
                     Install
                 </h1>
+                <div class="prose">
+                    
+<p>To use litdb with your favorite ORM, no driver is required. Just use the <code>litdb</code> package directly:</p>
+<div class="not-prose sh-copy cp flex cursor-pointer mb-3" onclick="copy(this)">
+                <div class="flex-grow bg-gray-800">
+                    <div class="pl-4 py-1 pb-1.5 align-middle whitespace-pre text-base text-gray-100"><p>npm install litdb</p>
+</div>
+                    </div>
+                <div class="flex">
+                    <div class="bg-green-600 text-white p-1.5 pb-0">
+                        <svg class="copied w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                        <svg class="nocopy w-6 h-6" title="copy" fill='none' stroke='white' viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg'>
+                            <path stroke-linecap='round' stroke-linejoin='round' stroke-width='1' d='M8 7v8a2 2 0 002 2h6M8 7V5a2 2 0 012-2h4.586a1 1 0 01.707.293l4.414 4.414a1 1 0 01.293.707V15a2 2 0 01-2 2h-2M8 7H6a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2v-2'></path>
+                        </svg>
+                    </div>
+                </div>
+            </div>
+<p><code>litdb</code> is also available as a module, where it can be used directly in the browser:</p>
+<pre><code class="language-html">&lt;script type=&quot;module&quot;&gt;
+import { sqlite as $ } from &quot;https://unpkg.com/litdb/dist/index.min.js&quot;
+    
+const { sql, params } = $.from(Contact).select(c =&gt; $`${c.name}`).build()
+&lt;/script&gt;
+</code></pre>
+<p>To get the most out of <code>litdb</code> we recommend using an editor that supports TypeScript definitions
+(e.g. VS Code, JetBrains IDES, neovim, etc.)</p>
+<h2 id="rdbms-drivers">RDBMS Drivers<a class="header-anchor" href="javascript:;" onclick="location.hash='#rdbms-drivers'" aria-label="Permalink">&ZeroWidthSpace;</a></h2>
+<p>Lightweight drivers with native support for its typed SQL Builders and parameterized SQL Expressions
+are also available for the popular databases:</p>
+<h3 id="bun-sqlite">Bun SQLite<a class="header-anchor" href="javascript:;" onclick="location.hash='#bun-sqlite'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
+<p>Use with <a href="https://bun.sh/docs/api/sqlite">Bun's native SQLite3 driver</a>:</p>
+<div class="not-prose sh-copy cp flex cursor-pointer mb-3" onclick="copy(this)">
+                <div class="flex-grow bg-gray-800">
+                    <div class="pl-4 py-1 pb-1.5 align-middle whitespace-pre text-base text-gray-100"><p>bun install @litdb/bun-sqlite</p>
+</div>
+                    </div>
+                <div class="flex">
+                    <div class="bg-green-600 text-white p-1.5 pb-0">
+                        <svg class="copied w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                        <svg class="nocopy w-6 h-6" title="copy" fill='none' stroke='white' viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg'>
+                            <path stroke-linecap='round' stroke-linejoin='round' stroke-width='1' d='M8 7v8a2 2 0 002 2h6M8 7V5a2 2 0 012-2h4.586a1 1 0 01.707.293l4.414 4.414a1 1 0 01.293.707V15a2 2 0 01-2 2h-2M8 7H6a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2v-2'></path>
+                        </svg>
+                    </div>
+                </div>
+            </div>
+<h3 id="postgresql">PostgreSQL<a class="header-anchor" href="javascript:;" onclick="location.hash='#postgresql'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
+<p>Use with <a href="https://github.com/porsager/postgres">postgres.js</a> client:</p>
+<div class="not-prose sh-copy cp flex cursor-pointer mb-3" onclick="copy(this)">
+                <div class="flex-grow bg-gray-800">
+                    <div class="pl-4 py-1 pb-1.5 align-middle whitespace-pre text-base text-gray-100"><p>npm install @litdb/postgres</p>
+</div>
+                    </div>
+                <div class="flex">
+                    <div class="bg-green-600 text-white p-1.5 pb-0">
+                        <svg class="copied w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                        <svg class="nocopy w-6 h-6" title="copy" fill='none' stroke='white' viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg'>
+                            <path stroke-linecap='round' stroke-linejoin='round' stroke-width='1' d='M8 7v8a2 2 0 002 2h6M8 7V5a2 2 0 012-2h4.586a1 1 0 01.707.293l4.414 4.414a1 1 0 01.293.707V15a2 2 0 01-2 2h-2M8 7H6a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2v-2'></path>
+                        </svg>
+                    </div>
+                </div>
+            </div>
+<h3 id="mysql">MySql<a class="header-anchor" href="javascript:;" onclick="location.hash='#mysql'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
+<p>Use with <a href="https://github.com/sidorares/node-mysql2">node-mysql2</a> client:</p>
+<div class="not-prose sh-copy cp flex cursor-pointer mb-3" onclick="copy(this)">
+                <div class="flex-grow bg-gray-800">
+                    <div class="pl-4 py-1 pb-1.5 align-middle whitespace-pre text-base text-gray-100"><p>npm install @litdb/mysql</p>
+</div>
+                    </div>
+                <div class="flex">
+                    <div class="bg-green-600 text-white p-1.5 pb-0">
+                        <svg class="copied w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                        <svg class="nocopy w-6 h-6" title="copy" fill='none' stroke='white' viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg'>
+                            <path stroke-linecap='round' stroke-linejoin='round' stroke-width='1' d='M8 7v8a2 2 0 002 2h6M8 7V5a2 2 0 012-2h4.586a1 1 0 01.707.293l4.414 4.414a1 1 0 01.293.707V15a2 2 0 01-2 2h-2M8 7H6a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2v-2'></path>
+                        </svg>
+                    </div>
+                </div>
+            </div>
+<h3 id="request-a-driver">Request a Driver<a class="header-anchor" href="javascript:;" onclick="location.hash='#request-a-driver'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
+<p>If you'd like to see a driver for a specific client, please open or vote for a feature request on litdb's
+<a href="https://github.com/litdb/litdb/discussions/categories/ideas">GitHub Discussions</a>.</p>
+
+                </div>
             </div>
         </div>
 
         <div class="flex justify-center py-10">
-            <div>
+            <div class="max-w-screen-lg">
+                <h1 class="text-6xl md:text-7xl lg:text-8xl font-bold tracking-tighter leading-tight md:leading-none mb-4 text-center">
+                    Type Safe
+                </h1>
+                <div class="mt-8 flex justify-center">
+                    <div class="prose">
+                        
+<p>Get productive intelli-sense for quickly accessing properties that exist your data model
+or design-time type-checking and compile-time static analysis errors for those that don't.</p>
+<p><img src="/img/features/typesafe.png" alt="" /></p>
+<p>Only reference table and columns that are included in your query, quickly identify missing tables, columns and any typos:</p>
+<p><img src="/img/features/typesafe2.png" alt="" /></p>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="flex justify-center py-10">
+            <div class="max-w-screen-lg">
                 <h1 class="text-6xl md:text-7xl lg:text-8xl font-bold tracking-tighter leading-tight md:leading-none mb-4 text-center">
                     Safe Refactoring
                 </h1>
-                <p class="mx-auto max-w-2xl text-lg tracking-tight text-slate-700 dark:text-slate-200">
-                    
-                </p>
+                <div class="mt-8 flex justify-center">
+                    <div class="prose">
+                        
+<p>Since all references are statically typed to your models, you can safely refactor with confidence!</p>
+<video autoplay="autoplay" loop="loop" controls>
+    <source src="/img/features/safe-refactoring.mp4" type="video/mp4">
+</video>
+
+                    </div>
+                </div>
             </div>
         </div>
 
@@ -198,6 +310,10 @@ mount('#header', Header)
 import { init } from "app.mjs"
 init()
 </script>
+<script src="/lib/js/lite-yt-embed.js"></script>
+<script src="/mjs/docs.mjs" type="module"></script>
+<script src="/lib/js/highlight.js"></script>
+<script>hljs.highlightAll()</script>
 
 </body>
 </html>

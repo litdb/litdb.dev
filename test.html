@@ -1,0 +1,25 @@
+<html>
+    <head>
+        <title>Test</title>
+    </head>
+    <body>
+        <pre id="results"></pre>
+        <script type="module">
+            import { sqlite as $, Table } from "https://unpkg.com/litdb/dist/index.min.js"
+    
+            class Contact {
+                id = 0
+                name = ''
+            }
+            Table(Contact, {
+                columns: {
+                    id:    { type:"INTEGER", primaryKey: true },
+                    name:  { type:"TEXT" },
+                }
+            })
+            
+            const { sql, params } = $.from(Contact).select(c => $`${c.name}`).build()
+            document.querySelector('#results').textContent = sql
+        </script>
+    </body>
+</html>
