@@ -6,6 +6,8 @@
 # Custom
 meta/
 dist/
+.DS_Store
+
 
 # User-specific files
 *.suo
