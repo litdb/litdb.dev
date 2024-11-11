@@ -204,7 +204,7 @@ const { sql, params } = $.from(Contact).select(c =&gt; $`${c.name}`).build()
 &lt;/script&gt;
 </code></pre>
 <p>To get the most out of <code>litdb</code> we recommend using an editor that supports TypeScript definitions
-(e.g. VS Code, JetBrains IDES, neovim, etc.)</p>
+(e.g. VS Code, JetBrains IDEs, neovim, etc.)</p>
 <h2 id="rdbms-drivers">RDBMS Drivers<a class="header-anchor" href="javascript:;" onclick="location.hash='#rdbms-drivers'" aria-label="Permalink">&ZeroWidthSpace;</a></h2>
 <p>Lightweight drivers with native support for its typed SQL Builders and parameterized SQL Expressions
 are also available for the popular databases:</p>
@@ -295,6 +295,78 @@ or design-time type-checking and compile-time static analysis errors for those t
 <video autoplay="autoplay" loop="loop" controls>
     <source src="/img/features/safe-refactoring.mp4" type="video/mp4">
 </video>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="flex justify-center py-10">
+            <div class="max-w-screen-lg">
+                <h1 class="text-6xl md:text-7xl lg:text-8xl font-bold tracking-tighter leading-tight md:leading-none mb-4 text-center">
+                    Composable
+                </h1>
+                <div class="mt-8 flex justify-center">
+                    <div class="prose">
+                        
+<p>Queries are highly composable, use external references to create complex inter reference queries.
+Embed parameterized SQL Builders and SQL fragments directly in your query expressions that
+can utilizing the full expressiveness of SQL.</p>
+<pre><code class="language-ts">const [ c, o ] = [ $.ref(Contact,'c'), $.ref(Order,'o') ]
+
+const now = new Date()
+const monthAgo = new Date(now.setDate(now.getDate()-30)).toISOString().split('T')[0]
+const last30Days = $.from(Order,'o2')
+    .where(o2 =&gt; $`${o2.contactId} = ${c.id}`)
+    .and(o2 =&gt; $`${o2.createdAt} &gt;= ${monthAgo}`)
+    .select(o2 =&gt; $`COUNT(${o2.id})`)
+
+const recentOrder = $.from(Order,'o3')
+    .where(o3 =&gt; $`${o3.contactId} = ${c.id}`)
+    .select(o3 =&gt; $`MAX(${o3.createdAt})`)
+
+// Example of SQL Fragment with parameter
+const startOfYear = `2024-01-01`
+const o4 = $.ref(Order,'o4')
+const totalOrders = $`SELECT SUM(${o4.total}) 
+     FROM ${o4} o4 
+    WHERE ${o4.contactId} = ${c.id} 
+      AND ${o4.createdAt} &gt;= ${startOfYear}`
+
+const q = $.from(c)
+    .join(o, { on:(c,o) =&gt; $`${c.id} = ${o.contactId}`})
+    .where`${o.createdAt} = (${recentOrder})`
+    .select`
+        ${c.id}, 
+        ${c.name}, 
+        ${o.createdAt} AS recentOrder, 
+        (${last30Days}) AS last30Days,
+        (${totalOrders}) AS totalOrders`
+    .orderBy`last30Days DESC`
+</code></pre>
+<p>Generated SQL</p>
+<pre><code class="language-sql">SELECT c.&quot;id&quot;, 
+       c.&quot;name&quot;, 
+       o.&quot;createdAt&quot; AS recentOrder, 
+       (SELECT COUNT(o2.&quot;id&quot;)
+          FROM &quot;Order&quot; o2
+         WHERE o2.&quot;contactId&quot; = c.&quot;id&quot;
+           AND o2.&quot;createdAt&quot; &gt;= $_1) AS last30Days,
+       (SELECT SUM(o4.&quot;total&quot;) 
+          FROM &quot;Order&quot; o4
+         WHERE o4.&quot;contactId&quot; = c.&quot;id&quot; 
+           AND o4.&quot;createdAt&quot; &gt;= $_2) AS totalOrders
+ FROM &quot;Contact&quot; c
+ JOIN &quot;Order&quot; o ON c.&quot;id&quot; = o.&quot;contactId&quot;
+WHERE o.&quot;createdAt&quot; = (SELECT MAX(o3.&quot;createdAt&quot;)
+        FROM &quot;Order&quot; o3
+        WHERE o3.&quot;contactId&quot; = c.&quot;id&quot;)
+ORDER BY last30Days DESC
+</code></pre>
+<p>PARAMS</p>
+<pre><code>_1: 2024-10-12,
+_2: 2024-01-01
+</code></pre>
 
                     </div>
                 </div>
