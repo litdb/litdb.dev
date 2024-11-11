@@ -9,6 +9,7 @@
         ?? pages.FirstOrDefault(x => x.Slug == $"_includes/{Model.LeftPart('.')}");
     if (doc?.Preview != null)
     {
+        Markdown.Fresh(doc);
         @Html.Raw(doc.Preview)
     }
 }

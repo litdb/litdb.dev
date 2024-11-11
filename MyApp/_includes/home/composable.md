@@ -1,8 +1,8 @@
-Queries are highly composable where external references and be used across multiple Query Builders and SQL fragments
+Queries are highly composable where external references can be used across multiple Query Builders and SQL fragments
 to easily create and compose multiple complex queries with shared references.
 
-SQL Builders and SQL fragments can be embedded inside other query builders where their SQL are parameters are merged
-into the parent query utilizing the full expressiveness of SQL.
+SQL Builders and SQL fragments can be embedded inside other query builders utilizing the full expressiveness of SQL 
+where their SQL and parameters are merged into the parent query.
 
 ```ts
 // External aliased table references used across multiple query builders
@@ -64,6 +64,6 @@ ORDER BY last30Days DESC
 
 PARAMS
 
-    _1: 2024-10-12,
+    _1: 2024-10-12
     _2: 2024-01-01
 

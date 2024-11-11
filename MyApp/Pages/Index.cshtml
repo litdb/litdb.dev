@@ -27,6 +27,7 @@
     <link rel="stylesheet" href="/css/highlight.css">
     <link rel="stylesheet" href="/css/lite-yt-embed.css">
     <style>
+    html { scroll-padding-top: 3rem }
     .prose :where(code):not(:where([class~="not-prose"] *)) {
         width: auto;
     }
@@ -71,10 +72,10 @@
                           style="background-image:url('/img/bg-video.png'); max-width:1280px; max-height:720px"></lite-youtube>
         </div>
 
-        <div class="flex justify-center py-10">
+        <div id="sql-like" class="flex justify-center py-10">
             <div>
                 <h1 class="text-6xl md:text-7xl lg:text-8xl font-bold tracking-tighter leading-tight md:leading-none mb-4 text-center">
-                    SQL-like
+                    <a href="#sql-like">SQL-like</a>
                 </h1>
                 <p class="mx-auto max-w-2xl text-lg tracking-tight text-slate-700 dark:text-slate-200">
                     No need to learn a new query language, <b>litdb</b> lets you write familiar <b>SQL you know</b> 
@@ -96,7 +97,8 @@
                     <br><br>
                 </p>
                 <div class="w-96 mx-auto">
-                    <img src="/img/sql-queries.jpeg" alt="SQL queries happen in this order">
+                    <a href="https://jvns.ca/blog/2019/10/03/sql-queries-don-t-start-with-select/">
+                        <img src="/img/sql-queries.jpeg" alt="SQL queries happen in this order" alt="SQL queries are run in this order"></a>
                 </div>
             </div>
         </div>
@@ -108,7 +110,7 @@
                     <div class="text-indigo-600 text-4xl font-semibold pb-4 -ml-10">kb</div>
                 </div>
                 <h1 class="text-6xl md:text-7xl lg:text-8xl font-bold tracking-tighter leading-tight md:leading-none mb-4 text-center md:text-left">
-                    Small
+                    <a id="small" href="#small">Small</a>
                 </h1>
                 <ul role="list" class="space-y-2 font-display text-base text-slate-700">
                     <li>
@@ -124,7 +126,7 @@
         <div class="flex justify-center py-10">
             <div class="max-w-screen-lg">
                 <h1 class="text-6xl md:text-7xl lg:text-8xl font-bold tracking-tighter leading-tight md:leading-none mb-4 text-center">
-                    Install
+                    <a id="install" href="#install">Install</a>
                 </h1>
                 <div class="prose">
                     @await Html.PartialAsync("IncludeMarkdown", "home/install.md")
@@ -135,7 +137,7 @@
         <div class="flex justify-center py-10">
             <div class="max-w-screen-lg">
                 <h1 class="text-6xl md:text-7xl lg:text-8xl font-bold tracking-tighter leading-tight md:leading-none mb-4 text-center">
-                    Type Safe
+                    <a id="type-safe" href="#type-safe">Type Safe</a>
                 </h1>
                 <div class="mt-8 flex justify-center">
                     <div class="prose">
@@ -148,7 +150,7 @@
         <div class="flex justify-center py-10">
             <div class="max-w-screen-lg">
                 <h1 class="text-6xl md:text-7xl lg:text-8xl font-bold tracking-tighter leading-tight md:leading-none mb-4 text-center">
-                    Safe Refactoring
+                    <a id="safe-refactoring" href="#safe-refactoring">Safe Refactoring</a>
                 </h1>
                 <div class="mt-8 flex justify-center">
                     <div class="prose">
@@ -161,7 +163,7 @@
         <div class="flex justify-center py-10">
             <div class="max-w-screen-lg">
                 <h1 class="text-6xl md:text-7xl lg:text-8xl font-bold tracking-tighter leading-tight md:leading-none mb-4 text-center">
-                    Composable
+                    <a id="composable" href="#composable">Composable</a>
                 </h1>
                 <div class="mt-8 flex justify-center">
                     <div class="prose">
