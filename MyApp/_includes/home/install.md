@@ -101,7 +101,7 @@ const contacts = db.all($.from(Contact).into(Contact))                // => Cont
 const bob = db.one($.from(Contact).where(hasId(bobId)).into(Contact)) // => Contact    
 const contactsCount = db.value($.from(Contact).select`COUNT(*)`)      // => number
 const emails = db.column($.from(Contact).select(c => $`${c.email}`))  // => string[]
-const dbContactsArray = db.arrays($.from(Contact))                    // => any[][]
+const contactsArray = db.arrays($.from(Contact))                      // => any[][]
 const bobArray = db.array($.from(Contact).where(hasId(bobId)))        // => any[]
 
 // Update examples
