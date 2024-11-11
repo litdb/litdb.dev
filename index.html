@@ -57,6 +57,9 @@
                         <a href="https://github.com/litdb/litdb/discussions" class="inline-flex items-center border-b-2 px-1 pt-1 text-sm font-medium border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 dark:hover:text-gray-200">
                             Discuss
                         </a>
+                        <a href="https://github.com/litdb/litdb" class="inline-flex items-center border-b-2 px-1 pt-1 text-sm font-medium border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 dark:hover:text-gray-200">
+                            GitHub <span class='ml-1 text-lg'>&star;</span>
+                        </a>
             </div>
         </div>
         <div class="hidden sm:ml-6 sm:flex sm:items-center">
@@ -88,6 +91,9 @@
                     </a>
                     <a href="https://github.com/litdb/litdb/discussions" class="block border-l-4 py-2 pl-3 pr-4 text-base font-medium border-transparent text-gray-600 dark:text-gray-300 hover:border-gray-300 hover:bg-gray-50 dark:hover:bg-gray-900 hover:text-gray-800 dark:hover:text-gray-100">
                         Discuss
+                    </a>
+                    <a href="https://github.com/litdb/litdb" class="block border-l-4 py-2 pl-3 pr-4 text-base font-medium border-transparent text-gray-600 dark:text-gray-300 hover:border-gray-300 hover:bg-gray-50 dark:hover:bg-gray-900 hover:text-gray-800 dark:hover:text-gray-100">
+                        GitHub <span class='ml-1 text-lg'>&star;</span>
                     </a>
         </div>
     </div>
@@ -314,7 +320,7 @@ const contacts = db.all($.from(Contact).into(Contact))                // =&gt; C
 const bob = db.one($.from(Contact).where(hasId(bobId)).into(Contact)) // =&gt; Contact    
 const contactsCount = db.value($.from(Contact).select`COUNT(*)`)      // =&gt; number
 const emails = db.column($.from(Contact).select(c =&gt; $`${c.email}`))  // =&gt; string[]
-const dbContactsArray = db.arrays($.from(Contact))                    // =&gt; any[][]
+const contactsArray = db.arrays($.from(Contact))                      // =&gt; any[][]
 const bobArray = db.array($.from(Contact).where(hasId(bobId)))        // =&gt; any[]
 
 // Update examples
