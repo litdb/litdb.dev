@@ -20,6 +20,7 @@
     <link rel="stylesheet" href="/css/highlight.css">
     <link rel="stylesheet" href="/css/lite-yt-embed.css">
     <style>
+    html { scroll-padding-top: 3rem }
     .prose :where(code):not(:where([class~="not-prose"] *)) {
         width: auto;
     }
@@ -136,10 +137,10 @@ mount('#header', Header)
                           style="background-image:url('/img/bg-video.png'); max-width:1280px; max-height:720px"></lite-youtube>
         </div>
 
-        <div class="flex justify-center py-10">
+        <div id="sql-like" class="flex justify-center py-10">
             <div>
                 <h1 class="text-6xl md:text-7xl lg:text-8xl font-bold tracking-tighter leading-tight md:leading-none mb-4 text-center">
-                    SQL-like
+                    <a href="#sql-like">SQL-like</a>
                 </h1>
                 <p class="mx-auto max-w-2xl text-lg tracking-tight text-slate-700 dark:text-slate-200">
                     No need to learn a new query language, <b>litdb</b> lets you write familiar <b>SQL you know</b> 
@@ -161,7 +162,8 @@ mount('#header', Header)
                     <br><br>
                 </p>
                 <div class="w-96 mx-auto">
-                    <img src="/img/sql-queries.jpeg" alt="SQL queries happen in this order">
+                    <a href="https://jvns.ca/blog/2019/10/03/sql-queries-don-t-start-with-select/">
+                        <img src="/img/sql-queries.jpeg" alt="SQL queries happen in this order" alt="SQL queries are run in this order"></a>
                 </div>
             </div>
         </div>
@@ -173,7 +175,7 @@ mount('#header', Header)
                     <div class="text-indigo-600 text-4xl font-semibold pb-4 -ml-10">kb</div>
                 </div>
                 <h1 class="text-6xl md:text-7xl lg:text-8xl font-bold tracking-tighter leading-tight md:leading-none mb-4 text-center md:text-left">
-                    Small
+                    <a id="small" href="#small">Small</a>
                 </h1>
                 <ul role="list" class="space-y-2 font-display text-base text-slate-700">
                     <li>
@@ -189,7 +191,7 @@ mount('#header', Header)
         <div class="flex justify-center py-10">
             <div class="max-w-screen-lg">
                 <h1 class="text-6xl md:text-7xl lg:text-8xl font-bold tracking-tighter leading-tight md:leading-none mb-4 text-center">
-                    Install
+                    <a id="install" href="#install">Install</a>
                 </h1>
                 <div class="prose">
                     
@@ -217,7 +219,7 @@ const { sql, params } = $.from(Contact).select(c =&gt; $`${c.name}`).build()
 </code></pre>
 <p>To get the most out of <code>litdb</code> we recommend using text editors that supports TypeScript definitions
 (e.g. VS Code, JetBrains IDEs, neovim, etc.)</p>
-<h2 id="rdbms-drivers">RDBMS Drivers<a class="header-anchor" href="javascript:;" onclick="location.hash='#rdbms-drivers'" aria-label="Permalink">&ZeroWidthSpace;</a></h2>
+<h1 id="litdb-drivers">LitDB Drivers<a class="header-anchor" href="javascript:;" onclick="location.hash='#litdb-drivers'" aria-label="Permalink">&ZeroWidthSpace;</a></h1>
 <p>Lightweight drivers with native support for its typed SQL Builders and parameterized SQL Expressions
 are also available for the popular databases:</p>
 <h3 id="bun-sqlite">Bun SQLite<a class="header-anchor" href="javascript:;" onclick="location.hash='#bun-sqlite'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
@@ -271,6 +273,60 @@ are also available for the popular databases:</p>
 <h3 id="request-a-driver">Request a Driver<a class="header-anchor" href="javascript:;" onclick="location.hash='#request-a-driver'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
 <p>If you'd like to see a driver for a specific client, please open or vote for a feature request on litdb's
 <a href="https://github.com/litdb/litdb/discussions/categories/ideas">GitHub Discussions</a>.</p>
+<h2 id="driver-usage">Driver Usage<a class="header-anchor" href="javascript:;" onclick="location.hash='#driver-usage'" aria-label="Permalink">&ZeroWidthSpace;</a></h2>
+<p>litdb drivers are lightweight data adapters providing a number of convenience APIs for executing SQL and parameters.
+They can be used with our without litdb SQL Builders, but offer the most value when used together.</p>
+<p>The same APIs are available across all drivers, so you can easily switch between them. They include both <strong>sync</strong> APIs
+recommended for SQLite libraries that use SQLite's native blocking APIs, whilst <strong>async</strong> APIs should be used for
+all other databases, e.g. PostgreSQL and MySQL.</p>
+<p>This is an example of using the Bun SQLite driver:</p>
+<p><strong>db.ts</strong></p>
+<pre><code class="language-ts">import { connect } from &quot;@litdb/bun-sqlite&quot;
+
+export const connection = connect(&quot;app.db&quot;)
+export const { $, async, sync } = connection
+</code></pre>
+<p><strong>app.ts</strong></p>
+<pre><code class="language-ts">import { $, sync as db } from &quot;./db&quot;
+import { Contact } from &quot;./models&quot;
+
+db.dropTable(Contact)
+db.createTable(Contact)
+db.insertAll([
+    new Contact({ name:&quot;John Doe&quot;, email:&quot;john@email.org&quot; }),
+    new Contact({ name:&quot;Jane Doe&quot;, email:&quot;jane@email.org&quot; }),
+])
+
+const janeEmail = 'jane@email.org'
+const jane = db.one&lt;Contact&gt;($.from(Contact).where(c =&gt; $`${c.email} = ${janeEmail}`))!
+
+// Insert examples
+const { lastInsertRowid:bobId } = db.insert(new Contact({ name:&quot;Bob&quot;, email:&quot;bob@email.org&quot; }))
+const { lastInsertRowid } = db.exec(`INSERT INTO Contact(name,email) VALUES ('Joe','joe@doe.org')`)
+const name = 'Alice', email = 'alice@email.org'
+db.exec`INSERT INTO Contact(name,email) VALUES (${name}, ${email})`
+
+// Typed SQL fragment example
+const hasId = &lt;Table extends { id:number }&gt;(id:number) =&gt;
+    (x:Table) =&gt; $.fragment($`${x.id} = $id`, { id })
+
+const contacts = db.all($.from(Contact).into(Contact))                // =&gt; Contact[]
+const bob = db.one($.from(Contact).where(hasId(bobId)).into(Contact)) // =&gt; Contact    
+const contactsCount = db.value($.from(Contact).select`COUNT(*)`)      // =&gt; number
+const emails = db.column($.from(Contact).select(c =&gt; $`${c.email}`))  // =&gt; string[]
+const dbContactsArray = db.arrays($.from(Contact))                    // =&gt; any[][]
+const bobArray = db.array($.from(Contact).where(hasId(bobId)))        // =&gt; any[]
+
+// Update examples
+jane.email = 'jane@doe.org'
+db.update(jane)                           // Update all properties
+db.update(jane, { onlyProps:['email'] })  // Update only email
+db.exec($.update(Contact).set({ email:jane.email }).where(hasId(jane.id))) // query builder
+
+// Delete examples
+db.delete(jane)
+db.exec($.deleteFrom(Contact).where(hasId(jane.id))) // query builder
+</code></pre>
 
                 </div>
             </div>
@@ -279,7 +335,7 @@ are also available for the popular databases:</p>
         <div class="flex justify-center py-10">
             <div class="max-w-screen-lg">
                 <h1 class="text-6xl md:text-7xl lg:text-8xl font-bold tracking-tighter leading-tight md:leading-none mb-4 text-center">
-                    Type Safe
+                    <a id="type-safe" href="#type-safe">Type Safe</a>
                 </h1>
                 <div class="mt-8 flex justify-center">
                     <div class="prose">
@@ -298,7 +354,7 @@ or design-time type-checking and compile-time static analysis errors for those t
         <div class="flex justify-center py-10">
             <div class="max-w-screen-lg">
                 <h1 class="text-6xl md:text-7xl lg:text-8xl font-bold tracking-tighter leading-tight md:leading-none mb-4 text-center">
-                    Safe Refactoring
+                    <a id="safe-refactoring" href="#safe-refactoring">Safe Refactoring</a>
                 </h1>
                 <div class="mt-8 flex justify-center">
                     <div class="prose">
@@ -316,15 +372,15 @@ or design-time type-checking and compile-time static analysis errors for those t
         <div class="flex justify-center py-10">
             <div class="max-w-screen-lg">
                 <h1 class="text-6xl md:text-7xl lg:text-8xl font-bold tracking-tighter leading-tight md:leading-none mb-4 text-center">
-                    Composable
+                    <a id="composable" href="#composable">Composable</a>
                 </h1>
                 <div class="mt-8 flex justify-center">
                     <div class="prose">
                         
-<p>Queries are highly composable where external references and be used across multiple Query Builders and SQL fragments
+<p>Queries are highly composable where external references can be used across multiple Query Builders and SQL fragments
 to easily create and compose multiple complex queries with shared references.</p>
-<p>SQL Builders and SQL fragments can be embedded inside other query builders where their SQL are parameters are merged
-into the parent query utilizing the full expressiveness of SQL.</p>
+<p>SQL Builders and SQL fragments can be embedded inside other query builders utilizing the full expressiveness of SQL
+where their SQL and parameters are merged into the parent query.</p>
 <pre><code class="language-ts">// External aliased table references used across multiple query builders
 const [ c, o ] = [ $.ref(Contact,'c'), $.ref(Order,'o') ]
 
@@ -379,7 +435,7 @@ WHERE o.&quot;createdAt&quot; = (SELECT MAX(o3.&quot;createdAt&quot;)
 ORDER BY last30Days DESC
 </code></pre>
 <p>PARAMS</p>
-<pre><code>_1: 2024-10-12,
+<pre><code>_1: 2024-10-12
 _2: 2024-01-01
 </code></pre>
 
