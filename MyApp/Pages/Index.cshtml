@@ -78,14 +78,26 @@
                 </h1>
                 <p class="mx-auto max-w-2xl text-lg tracking-tight text-slate-700 dark:text-slate-200">
                     No need to learn a new query language, <b>litdb</b> lets you write familiar <b>SQL you know</b> 
-                    using its <b>type-safe</b> expressions and query builders that's safe by default.
+                    using its <b>type-safe</b> expressions and query builders that's <b>safe by default</b>.
                     <br><br>
                     
                     APIs are designed to keep a close affinity to SQL making it clear what SQL is being generated,  
                     expressions utilize tagged templates to take away the tedium of maintaining table and column
                     references, parameterizing values and catering for different SQL dialects to retain the 
-                    <b>expressive</b> freedom of SQL and <b>portable</b> across multiple RDBMS's.
+                    <b>expressive</b> freedom of SQL, but <b>portable</b> across multiple RDBMS's.
+
+                    <br><br>
+                    The primary difference between SQL is how queries are constructed, where the SELECT Query Builder
+                    wants queries to be constructed in
+                    <a class="text-blue-500 hover:text-blue-600" href="https://jvns.ca/blog/2019/10/03/sql-queries-don-t-start-with-select/">the order they're run</a>, 
+                    by specifying the data sources first, i.e. the FROM table first, followed by any JOINs 
+                    (just like <a class="text-blue-500 hover:text-blue-600" href="https://jvns.ca/blog/2019/10/03/sql-queries-don-t-start-with-select/#linq-starts-queries-with-from">LINQ</a>)
+                    which allows litdb query builders to provide type safety and intellisense for the rest of the query.
+                    <br><br>
                 </p>
+                <div class="w-96 mx-auto">
+                    <img src="/img/sql-queries.jpeg" alt="SQL queries happen in this order">
+                </div>
             </div>
         </div>
 

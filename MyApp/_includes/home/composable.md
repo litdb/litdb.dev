@@ -1,8 +1,11 @@
-Queries are highly composable, use external references to create complex inter reference queries.
-Embed parameterized SQL Builders and SQL fragments directly in your query expressions that
-can utilizing the full expressiveness of SQL.
+Queries are highly composable where external references and be used across multiple Query Builders and SQL fragments
+to easily create and compose multiple complex queries with shared references.
+
+SQL Builders and SQL fragments can be embedded inside other query builders where their SQL are parameters are merged
+into the parent query utilizing the full expressiveness of SQL.
 
 ```ts
+// External aliased table references used across multiple query builders
 const [ c, o ] = [ $.ref(Contact,'c'), $.ref(Order,'o') ]
 
 const now = new Date()
@@ -24,6 +27,7 @@ const totalOrders = $`SELECT SUM(${o4.total})
     WHERE ${o4.contactId} = ${c.id} 
       AND ${o4.createdAt} >= ${startOfYear}`
 
+// Compose queries from multiple query builders and SQL fragments
 const q = $.from(c)
     .join(o, { on:(c,o) => $`${c.id} = ${o.contactId}`})
     .where`${o.createdAt} = (${recentOrder})`

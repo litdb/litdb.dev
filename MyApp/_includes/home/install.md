@@ -14,7 +14,7 @@ const { sql, params } = $.from(Contact).select(c => $`${c.name}`).build()
 </script>
 ```
 
-To get the most out of `litdb` we recommend using an editor that supports TypeScript definitions 
+To get the most out of `litdb` we recommend using text editors that supports TypeScript definitions 
 (e.g. VS Code, JetBrains IDEs, neovim, etc.)
 
 ## RDBMS Drivers
