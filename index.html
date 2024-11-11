@@ -143,14 +143,26 @@ mount('#header', Header)
                 </h1>
                 <p class="mx-auto max-w-2xl text-lg tracking-tight text-slate-700 dark:text-slate-200">
                     No need to learn a new query language, <b>litdb</b> lets you write familiar <b>SQL you know</b> 
-                    using its <b>type-safe</b> expressions and query builders that's safe by default.
+                    using its <b>type-safe</b> expressions and query builders that's <b>safe by default</b>.
                     <br><br>
                     
                     APIs are designed to keep a close affinity to SQL making it clear what SQL is being generated,  
                     expressions utilize tagged templates to take away the tedium of maintaining table and column
                     references, parameterizing values and catering for different SQL dialects to retain the 
-                    <b>expressive</b> freedom of SQL and <b>portable</b> across multiple RDBMS's.
+                    <b>expressive</b> freedom of SQL, but <b>portable</b> across multiple RDBMS's.
+
+                    <br><br>
+                    The primary difference between SQL is how queries are constructed, where the SELECT Query Builder
+                    wants queries to be constructed in
+                    <a class="text-blue-500 hover:text-blue-600" href="https://jvns.ca/blog/2019/10/03/sql-queries-don-t-start-with-select/">the order they're run</a>, 
+                    by specifying the data sources first, i.e. the FROM table first, followed by any JOINs 
+                    (just like <a class="text-blue-500 hover:text-blue-600" href="https://jvns.ca/blog/2019/10/03/sql-queries-don-t-start-with-select/#linq-starts-queries-with-from">LINQ</a>)
+                    which allows litdb query builders to provide type safety and intellisense for the rest of the query.
+                    <br><br>
                 </p>
+                <div class="w-96 mx-auto">
+                    <img src="/img/sql-queries.jpeg" alt="SQL queries happen in this order">
+                </div>
             </div>
         </div>
 
@@ -203,7 +215,7 @@ import { sqlite as $ } from &quot;https://unpkg.com/litdb/dist/index.min.js&quot
 const { sql, params } = $.from(Contact).select(c =&gt; $`${c.name}`).build()
 &lt;/script&gt;
 </code></pre>
-<p>To get the most out of <code>litdb</code> we recommend using an editor that supports TypeScript definitions
+<p>To get the most out of <code>litdb</code> we recommend using text editors that supports TypeScript definitions
 (e.g. VS Code, JetBrains IDEs, neovim, etc.)</p>
 <h2 id="rdbms-drivers">RDBMS Drivers<a class="header-anchor" href="javascript:;" onclick="location.hash='#rdbms-drivers'" aria-label="Permalink">&ZeroWidthSpace;</a></h2>
 <p>Lightweight drivers with native support for its typed SQL Builders and parameterized SQL Expressions
@@ -309,10 +321,12 @@ or design-time type-checking and compile-time static analysis errors for those t
                 <div class="mt-8 flex justify-center">
                     <div class="prose">
                         
-<p>Queries are highly composable, use external references to create complex inter reference queries.
-Embed parameterized SQL Builders and SQL fragments directly in your query expressions that
-can utilizing the full expressiveness of SQL.</p>
-<pre><code class="language-ts">const [ c, o ] = [ $.ref(Contact,'c'), $.ref(Order,'o') ]
+<p>Queries are highly composable where external references and be used across multiple Query Builders and SQL fragments
+to easily create and compose multiple complex queries with shared references.</p>
+<p>SQL Builders and SQL fragments can be embedded inside other query builders where their SQL are parameters are merged
+into the parent query utilizing the full expressiveness of SQL.</p>
+<pre><code class="language-ts">// External aliased table references used across multiple query builders
+const [ c, o ] = [ $.ref(Contact,'c'), $.ref(Order,'o') ]
 
 const now = new Date()
 const monthAgo = new Date(now.setDate(now.getDate()-30)).toISOString().split('T')[0]
@@ -333,6 +347,7 @@ const totalOrders = $`SELECT SUM(${o4.total})
     WHERE ${o4.contactId} = ${c.id} 
       AND ${o4.createdAt} &gt;= ${startOfYear}`
 
+// Compose queries from multiple query builders and SQL fragments
 const q = $.from(c)
     .join(o, { on:(c,o) =&gt; $`${c.id} = ${o.contactId}`})
     .where`${o.createdAt} = (${recentOrder})`
