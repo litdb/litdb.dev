@@ -38,7 +38,7 @@ Use with [postgres.js](https://github.com/porsager/postgres) client:
 npm install @litdb/postgres
 :::
 
-### MySql
+### MySQL
 
 Use with [node-mysql2](https://github.com/sidorares/node-mysql2) client:
 
@@ -93,9 +93,9 @@ const { lastInsertRowid } = db.exec`INSERT INTO Contact(name,email) VALUES ('Joe
 const name = 'Alice', email = 'alice@email.org'
 db.exec`INSERT INTO Contact(name,email) VALUES (${name}, ${email})`
 
-// Typed SQL fragment example
-const hasId = <Table extends { id:number }>(id:number) =>
-    (x:Table) => $.fragment($`${x.id} = $id`, { id })
+// Typed SQL fragment with named param example
+const hasId = <Table extends { id:number }>(id:number|bigint) =>
+    (x:Table) => $.sql($`${x.id} = $id`, { id })
 
 const contacts = db.all($.from(Contact).into(Contact))                // => Contact[]
 const bob = db.one($.from(Contact).where(hasId(bobId)).into(Contact)) // => Contact    

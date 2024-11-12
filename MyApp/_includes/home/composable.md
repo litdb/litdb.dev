@@ -5,7 +5,7 @@ SQL Builders and SQL fragments can be embedded inside other query builders utili
 where their SQL and parameters are merged into the parent query.
 
 ```ts
-// External aliased table references used across multiple query builders
+// Use external aliased table references across multiple query builders
 const [ c, o ] = [ $.ref(Contact,'c'), $.ref(Order,'o') ]
 
 const now = new Date()
