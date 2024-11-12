@@ -5,7 +5,7 @@
     <meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="icon" type="image/svg" href="/img/logo.svg">
-    <title>Home page</title>
+    <title>litdb - type safe SQL for TypeScript/JavaScript</title>
     <script>
     if (location.search === "?dark") localStorage.setItem('color-scheme','dark') 
     if (location.search === "?light") localStorage.removeItem('color-scheme') 
@@ -58,7 +58,7 @@
                             Discuss
                         </a>
                         <a href="https://github.com/litdb/litdb" class="inline-flex items-center border-b-2 px-1 pt-1 text-sm font-medium border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 dark:hover:text-gray-200">
-                            GitHub <span class='ml-1 text-lg'>&star;</span>
+                            <span class='mr-1 text-xl'>&star;</span> GitHub
                         </a>
             </div>
         </div>
@@ -93,7 +93,7 @@
                         Discuss
                     </a>
                     <a href="https://github.com/litdb/litdb" class="block border-l-4 py-2 pl-3 pr-4 text-base font-medium border-transparent text-gray-600 dark:text-gray-300 hover:border-gray-300 hover:bg-gray-50 dark:hover:bg-gray-900 hover:text-gray-800 dark:hover:text-gray-100">
-                        GitHub <span class='ml-1 text-lg'>&star;</span>
+                        <span class='mr-1 text-xl'>&star;</span> GitHub
                     </a>
         </div>
     </div>
@@ -260,7 +260,7 @@ are also available for the popular databases:</p>
                     </div>
                 </div>
             </div>
-<h3 id="mysql">MySql<a class="header-anchor" href="javascript:;" onclick="location.hash='#mysql'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
+<h3 id="mysql">MySQL<a class="header-anchor" href="javascript:;" onclick="location.hash='#mysql'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
 <p>Use with <a href="https://github.com/sidorares/node-mysql2">node-mysql2</a> client:</p>
 <div class="not-prose sh-copy cp flex cursor-pointer mb-3" onclick="copy(this)">
                 <div class="flex-grow bg-gray-800">
@@ -312,9 +312,9 @@ const { lastInsertRowid } = db.exec`INSERT INTO Contact(name,email) VALUES ('Joe
 const name = 'Alice', email = 'alice@email.org'
 db.exec`INSERT INTO Contact(name,email) VALUES (${name}, ${email})`
 
-// Typed SQL fragment example
-const hasId = &lt;Table extends { id:number }&gt;(id:number) =&gt;
-    (x:Table) =&gt; $.fragment($`${x.id} = $id`, { id })
+// Typed SQL fragment with named param example
+const hasId = &lt;Table extends { id:number }&gt;(id:number|bigint) =&gt;
+    (x:Table) =&gt; $.sql($`${x.id} = $id`, { id })
 
 const contacts = db.all($.from(Contact).into(Contact))                // =&gt; Contact[]
 const bob = db.one($.from(Contact).where(hasId(bobId)).into(Contact)) // =&gt; Contact    
@@ -387,7 +387,7 @@ or design-time type-checking and compile-time static analysis errors for those t
 to easily create and compose multiple complex queries with shared references.</p>
 <p>SQL Builders and SQL fragments can be embedded inside other query builders utilizing the full expressiveness of SQL
 where their SQL and parameters are merged into the parent query.</p>
-<pre><code class="language-ts">// External aliased table references used across multiple query builders
+<pre><code class="language-ts">// Use external aliased table references across multiple query builders
 const [ c, o ] = [ $.ref(Contact,'c'), $.ref(Order,'o') ]
 
 const now = new Date()
