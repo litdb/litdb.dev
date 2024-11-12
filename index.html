@@ -244,6 +244,22 @@ are also available for the popular databases:</p>
                     </div>
                 </div>
             </div>
+<h3 id="node-better-sqlite">Node better-sqlite<a class="header-anchor" href="javascript:;" onclick="location.hash='#node-better-sqlite'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
+<p>Use with Node <a href="https://github.com/WiseLibs/better-sqlite3">better-sqlite3</a>:</p>
+<div class="not-prose sh-copy cp flex cursor-pointer mb-3" onclick="copy(this)">
+                <div class="flex-grow bg-gray-800">
+                    <div class="pl-4 py-1 pb-1.5 align-middle whitespace-pre text-base text-gray-100"><p>npm install @litdb/better-sqlite</p>
+</div>
+                    </div>
+                <div class="flex">
+                    <div class="bg-green-600 text-white p-1.5 pb-0">
+                        <svg class="copied w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                        <svg class="nocopy w-6 h-6" title="copy" fill='none' stroke='white' viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg'>
+                            <path stroke-linecap='round' stroke-linejoin='round' stroke-width='1' d='M8 7v8a2 2 0 002 2h6M8 7V5a2 2 0 012-2h4.586a1 1 0 01.707.293l4.414 4.414a1 1 0 01.293.707V15a2 2 0 01-2 2h-2M8 7H6a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2v-2'></path>
+                        </svg>
+                    </div>
+                </div>
+            </div>
 <h3 id="postgresql">PostgreSQL<a class="header-anchor" href="javascript:;" onclick="location.hash='#postgresql'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
 <p>Use with <a href="https://github.com/porsager/postgres">postgres.js</a> client:</p>
 <div class="not-prose sh-copy cp flex cursor-pointer mb-3" onclick="copy(this)">
@@ -299,17 +315,17 @@ import { Contact } from &quot;./models&quot;
 db.dropTable(Contact)
 db.createTable(Contact)
 db.insertAll([
-    new Contact({ name:&quot;John Doe&quot;, email:&quot;john@email.org&quot; }),
-    new Contact({ name:&quot;Jane Doe&quot;, email:&quot;jane@email.org&quot; }),
+    new Contact({ name:&quot;John Doe&quot;, email:&quot;john@mail.org&quot; }),
+    new Contact({ name:&quot;Jane Doe&quot;, email:&quot;jane@mail.org&quot; }),
 ])
 
-const janeEmail = 'jane@email.org'
+const janeEmail = 'jane@mail.org'
 const jane = db.one&lt;Contact&gt;($.from(Contact).where(c =&gt; $`${c.email} = ${janeEmail}`))!
 
 // Insert examples
-const { lastInsertRowid:bobId } = db.insert(new Contact({ name:&quot;Bob&quot;, email:&quot;bob@email.org&quot; }))
-const { lastInsertRowid } = db.exec`INSERT INTO Contact(name,email) VALUES ('Joe','joe@doe.org')`
-const name = 'Alice', email = 'alice@email.org'
+const { lastInsertRowid: bobId } = db.insert(new Contact({ name:&quot;Bob&quot;, email:&quot;bob@mail.org&quot; }))
+const { lastInsertRowid } = db.exec`INSERT INTO Contact(name,email) VALUES ('Jo','jo@doe.org')`
+const name = 'Alice', email = 'alice@mail.org'
 db.exec`INSERT INTO Contact(name,email) VALUES (${name}, ${email})`
 
 // Typed SQL fragment with named param example
