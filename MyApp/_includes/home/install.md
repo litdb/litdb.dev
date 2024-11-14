@@ -40,7 +40,7 @@ npm install @litdb/better-sqlite
 
 ### PostgreSQL
 
-Use with [postgres.js](https://github.com/porsager/postgres) client:
+Use with the [postgres.js](https://github.com/porsager/postgres) client:
 
 :::sh
 npm install @litdb/postgres
@@ -48,10 +48,10 @@ npm install @litdb/postgres
 
 ### MySQL
 
-Use with [node-mysql2](https://github.com/sidorares/node-mysql2) client:
+Use with the [mysql2](https://github.com/sidorares/node-mysql2) client:
 
 :::sh
-npm install @litdb/mysql
+npm install @litdb/mysql2
 :::
 
 ### Request a Driver
@@ -126,3 +126,78 @@ db.exec($.update(Contact).set({ email:jane.email }).where(hasId(jane.id))) // qu
 db.delete(jane)
 db.exec($.deleteFrom(Contact).where(hasId(jane.id))) // query builder
 ```
+
+Same source is compatible with other sync drivers, just replace `@litdb/bun-sqlite` with `@litdb/better-sqlite` to use
+with [litdb/better-sqlite](https://github.com/litdb/better-sqlite).
+
+## ASYNC Driver Usage
+
+The same APIs are available for async access to remote RDBMS's like PostgreSQL and MySQL. 
+
+This is an example of using the [postgres.js](https://github.com/porsager/postgres) driver:
+
+**db.ts**
+
+```ts
+import { connect } from "@litdb/postgres"
+
+export const connection = connect({ hostname, database, user, password })
+export const { $, async:db, native:sql } = connection
+```
+
+:::tip
+When needed use `sql` to access the native [postgres.js sql function](https://github.com/porsager/postgres#usage)
+:::
+
+**app.ts**
+
+```ts
+import { $, db } from "./db"
+import { Contact } from "./models"
+
+await db.dropTable(Contact)
+await db.createTable(Contact)
+await db.insertAll([
+    new Contact({ name:"John Doe", email:"john@mail.org" }),
+    new Contact({ name:"Jane Doe", email:"jane@mail.org" }),
+])
+
+const janeEmail = 'jane@mail.org'
+const jane = await db.one<Contact>($.from(Contact).where(c => $`${c.email}=${janeEmail}`))
+
+// Insert examples
+const { lastInsertRowid:bobId } = await db.insert(
+    new Contact({ name:"Bob", email:"bob@mail.org"}))
+
+const { lastInsertRowid } = await db.exec
+    `INSERT INTO Contact(name,email) VALUES('Jo','jo@doe.org')`
+
+const name = 'Alice', email = 'alice@mail.org'
+await db.exec`INSERT INTO Contact(name,email) VALUES (${name}, ${email})`
+
+// Typed SQL fragment with named param example
+const hasId = <Table extends { id:number }>(id:number|bigint) =>
+    (x:Table) => $.sql($`${x.id} = $id`, { id })
+
+const contacts = await db.all($.from(Contact).into(Contact))                // => Contact[]
+const bob = await db.one($.from(Contact).where(hasId(bobId)).into(Contact)) // => Contact
+const contactsCount = await db.value($.from(Contact).rowCount())            // => number
+const emails = await db.column($.from(Contact).select(c => $`${c.email}`))  // => string[]
+const contactsArray = await db.arrays($.from(Contact))                      // => any[][]
+const bobArray = await db.array($.from(Contact).where(hasId(bobId)))        // => any[]
+
+// Update examples
+jane.email = 'jane@doe.org'
+await db.update(jane)                           // Update all properties
+await db.update(jane, { onlyProps:['email'] })  // Update only email
+// query builder
+await db.exec($.update(Contact).set({ email:jane.email }).where(hasId(jane.id)))
+
+// Delete examples
+await db.delete(jane)
+await db.exec($.deleteFrom(Contact).where(hasId(jane.id))) // query builder
+```
+
+Same source is compatible with other async drivers, just replace `@litdb/postgres` with `@litdb/mysql2` to use
+with [litdb/mysql2](https://github.com/litdb/mysql2).
+
