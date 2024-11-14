@@ -301,7 +301,7 @@ They can be used with our without litdb SQL Builders, but offer the most value w
 <p>The same APIs are available across all drivers, so you can easily switch between them. They include both <strong>sync</strong> APIs
 recommended for SQLite libraries that use SQLite's native blocking APIs, whilst <strong>async</strong> APIs should be used for
 all other databases, e.g. PostgreSQL and MySQL.</p>
-<p>This is an example of using the <a href="https://bun.sh/docs/api/sqlite">Bun SQLite</a> driver:</p>
+<p>Example of using the <a href="https://bun.sh/docs/api/sqlite">Bun SQLite</a> driver:</p>
 <p><strong>db.ts</strong></p>
 <pre><code class="language-ts">import { connect } from &quot;@litdb/bun-sqlite&quot;
 
@@ -354,9 +354,9 @@ db.exec($.deleteFrom(Contact).where(hasId(jane.id))) // query builder
 </code></pre>
 <p>Same source is compatible with other sync drivers, just replace <code>@litdb/bun-sqlite</code> with <code>@litdb/better-sqlite</code> to use
 with <a href="https://github.com/litdb/better-sqlite">litdb/better-sqlite</a>.</p>
-<h2 id="async-driver-usage">ASYNC Driver Usage<a class="header-anchor" href="javascript:;" onclick="location.hash='#async-driver-usage'" aria-label="Permalink">&ZeroWidthSpace;</a></h2>
-<p>The same APIs are available for async access to remote RDBMS's like PostgreSQL and MySQL.</p>
-<p>This is an example of using the <a href="https://github.com/porsager/postgres">postgres.js</a> driver:</p>
+<h2 id="async-driver-usage">Async Driver Usage<a class="header-anchor" href="javascript:;" onclick="location.hash='#async-driver-usage'" aria-label="Permalink">&ZeroWidthSpace;</a></h2>
+<p>The same APIs (returning promises) are available for async access to remote RDBMS's like PostgreSQL and MySQL.</p>
+<p>Example of using the <a href="https://github.com/porsager/postgres">postgres.js</a> driver:</p>
 <p><strong>db.ts</strong></p>
 <pre><code class="language-ts">import { connect } from &quot;@litdb/postgres&quot;
 
