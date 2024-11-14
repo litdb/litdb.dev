@@ -68,7 +68,7 @@ The same APIs are available across all drivers, so you can easily switch between
 recommended for SQLite libraries that use SQLite's native blocking APIs, whilst **async** APIs should be used for 
 all other databases, e.g. PostgreSQL and MySQL.
 
-This is an example of using the [Bun SQLite](https://bun.sh/docs/api/sqlite) driver:
+Example of using the [Bun SQLite](https://bun.sh/docs/api/sqlite) driver:
 
 **db.ts**
 
@@ -130,11 +130,11 @@ db.exec($.deleteFrom(Contact).where(hasId(jane.id))) // query builder
 Same source is compatible with other sync drivers, just replace `@litdb/bun-sqlite` with `@litdb/better-sqlite` to use
 with [litdb/better-sqlite](https://github.com/litdb/better-sqlite).
 
-## ASYNC Driver Usage
+## Async Driver Usage
 
-The same APIs are available for async access to remote RDBMS's like PostgreSQL and MySQL. 
+The same APIs (returning promises) are available for async access to remote RDBMS's like PostgreSQL and MySQL. 
 
-This is an example of using the [postgres.js](https://github.com/porsager/postgres) driver:
+Example of using the [postgres.js](https://github.com/porsager/postgres) driver:
 
 **db.ts**
 
