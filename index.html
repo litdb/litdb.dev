@@ -305,11 +305,14 @@ all other databases, e.g. PostgreSQL and MySQL.</p>
 <p><strong>db.ts</strong></p>
 <pre><code class="language-ts">import { connect } from &quot;@litdb/bun-sqlite&quot;
 
-export const connection = connect(&quot;app.db&quot;)
-export const { $, async, sync } = connection
+export const connection = connect(&quot;app.db&quot;) // WAL
+export const { $, sync:db, async } = connection
 </code></pre>
+<blockquote>
+<p>When needed use <code>native</code> to access underlying driver</p>
+</blockquote>
 <p><strong>app.ts</strong></p>
-<pre><code class="language-ts">import { $, sync as db } from &quot;./db&quot;
+<pre><code class="language-ts">import { $, db } from &quot;./db&quot;
 import { Contact } from &quot;./models&quot;
 
 db.dropTable(Contact)
@@ -381,7 +384,7 @@ or design-time type-checking and compile-time static analysis errors for those t
                 <div class="mt-8 flex justify-center">
                     <div class="prose">
                         
-<p>Since all references are statically typed to your models, you can safely refactor with confidence!</p>
+<p>All references are statically typed to your models so you can safely refactor with confidence!</p>
 <video autoplay="autoplay" loop="loop" controls>
     <source src="/img/features/safe-refactoring.mp4" type="video/mp4">
 </video>
