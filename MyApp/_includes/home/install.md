@@ -75,14 +75,16 @@ This is an example of using the Bun SQLite driver:
 ```ts
 import { connect } from "@litdb/bun-sqlite"
 
-export const connection = connect("app.db")
-export const { $, async, sync } = connection
+export const connection = connect("app.db") // WAL
+export const { $, sync:db, async } = connection
 ```
+
+> When needed use `native` to access underlying driver
 
 **app.ts**
 
 ```ts
-import { $, sync as db } from "./db"
+import { $, db } from "./db"
 import { Contact } from "./models"
 
 db.dropTable(Contact)
