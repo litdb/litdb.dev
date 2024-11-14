@@ -261,7 +261,7 @@ are also available for the popular databases:</p>
                 </div>
             </div>
 <h3 id="postgresql">PostgreSQL<a class="header-anchor" href="javascript:;" onclick="location.hash='#postgresql'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
-<p>Use with <a href="https://github.com/porsager/postgres">postgres.js</a> client:</p>
+<p>Use with the <a href="https://github.com/porsager/postgres">postgres.js</a> client:</p>
 <div class="not-prose sh-copy cp flex cursor-pointer mb-3" onclick="copy(this)">
                 <div class="flex-grow bg-gray-800">
                     <div class="pl-4 py-1 pb-1.5 align-middle whitespace-pre text-base text-gray-100"><p>npm install @litdb/postgres</p>
@@ -277,10 +277,10 @@ are also available for the popular databases:</p>
                 </div>
             </div>
 <h3 id="mysql">MySQL<a class="header-anchor" href="javascript:;" onclick="location.hash='#mysql'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
-<p>Use with <a href="https://github.com/sidorares/node-mysql2">node-mysql2</a> client:</p>
+<p>Use with the <a href="https://github.com/sidorares/node-mysql2">mysql2</a> client:</p>
 <div class="not-prose sh-copy cp flex cursor-pointer mb-3" onclick="copy(this)">
                 <div class="flex-grow bg-gray-800">
-                    <div class="pl-4 py-1 pb-1.5 align-middle whitespace-pre text-base text-gray-100"><p>npm install @litdb/mysql</p>
+                    <div class="pl-4 py-1 pb-1.5 align-middle whitespace-pre text-base text-gray-100"><p>npm install @litdb/mysql2</p>
 </div>
                     </div>
                 <div class="flex">
@@ -352,6 +352,68 @@ db.exec($.update(Contact).set({ email:jane.email }).where(hasId(jane.id))) // qu
 db.delete(jane)
 db.exec($.deleteFrom(Contact).where(hasId(jane.id))) // query builder
 </code></pre>
+<p>Same source is compatible with other sync drivers, just replace <code>@litdb/bun-sqlite</code> with <code>@litdb/better-sqlite</code> to use
+with <a href="https://github.com/litdb/better-sqlite">litdb/better-sqlite</a>.</p>
+<h2 id="async-driver-usage">ASYNC Driver Usage<a class="header-anchor" href="javascript:;" onclick="location.hash='#async-driver-usage'" aria-label="Permalink">&ZeroWidthSpace;</a></h2>
+<p>The same APIs are available for async access to remote RDBMS's like PostgreSQL and MySQL.</p>
+<p>This is an example of using the <a href="https://github.com/porsager/postgres">postgres.js</a> driver:</p>
+<p><strong>db.ts</strong></p>
+<pre><code class="language-ts">import { connect } from &quot;@litdb/postgres&quot;
+
+export const connection = connect({ hostname, database, user, password })
+export const { $, async:db, native:sql } = connection
+</code></pre>
+<div class="tip custom-block">
+            <p class="custom-block-title">TIP</p><p>When needed use <code>sql</code> to access the native <a href="https://github.com/porsager/postgres#usage">postgres.js sql function</a></p>
+</div>
+<p><strong>app.ts</strong></p>
+<pre><code class="language-ts">import { $, db } from &quot;./db&quot;
+import { Contact } from &quot;./models&quot;
+
+await db.dropTable(Contact)
+await db.createTable(Contact)
+await db.insertAll([
+    new Contact({ name:&quot;John Doe&quot;, email:&quot;john@mail.org&quot; }),
+    new Contact({ name:&quot;Jane Doe&quot;, email:&quot;jane@mail.org&quot; }),
+])
+
+const janeEmail = 'jane@mail.org'
+const jane = await db.one&lt;Contact&gt;($.from(Contact).where(c =&gt; $`${c.email}=${janeEmail}`))
+
+// Insert examples
+const { lastInsertRowid:bobId } = await db.insert(
+    new Contact({ name:&quot;Bob&quot;, email:&quot;bob@mail.org&quot;}))
+
+const { lastInsertRowid } = await db.exec
+    `INSERT INTO Contact(name,email) VALUES('Jo','jo@doe.org')`
+
+const name = 'Alice', email = 'alice@mail.org'
+await db.exec`INSERT INTO Contact(name,email) VALUES (${name}, ${email})`
+
+// Typed SQL fragment with named param example
+const hasId = &lt;Table extends { id:number }&gt;(id:number|bigint) =&gt;
+    (x:Table) =&gt; $.sql($`${x.id} = $id`, { id })
+
+const contacts = await db.all($.from(Contact).into(Contact))                // =&gt; Contact[]
+const bob = await db.one($.from(Contact).where(hasId(bobId)).into(Contact)) // =&gt; Contact
+const contactsCount = await db.value($.from(Contact).rowCount())            // =&gt; number
+const emails = await db.column($.from(Contact).select(c =&gt; $`${c.email}`))  // =&gt; string[]
+const contactsArray = await db.arrays($.from(Contact))                      // =&gt; any[][]
+const bobArray = await db.array($.from(Contact).where(hasId(bobId)))        // =&gt; any[]
+
+// Update examples
+jane.email = 'jane@doe.org'
+await db.update(jane)                           // Update all properties
+await db.update(jane, { onlyProps:['email'] })  // Update only email
+// query builder
+await db.exec($.update(Contact).set({ email:jane.email }).where(hasId(jane.id)))
+
+// Delete examples
+await db.delete(jane)
+await db.exec($.deleteFrom(Contact).where(hasId(jane.id))) // query builder
+</code></pre>
+<p>Same source is compatible with other async drivers, just replace <code>@litdb/postgres</code> with <code>@litdb/mysql2</code> to use
+with <a href="https://github.com/litdb/mysql2">litdb/mysql2</a>.</p>
 
                 </div>
             </div>
