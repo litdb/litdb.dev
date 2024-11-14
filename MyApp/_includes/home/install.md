@@ -68,18 +68,20 @@ The same APIs are available across all drivers, so you can easily switch between
 recommended for SQLite libraries that use SQLite's native blocking APIs, whilst **async** APIs should be used for 
 all other databases, e.g. PostgreSQL and MySQL.
 
-This is an example of using the Bun SQLite driver:
+This is an example of using the [Bun SQLite](https://bun.sh/docs/api/sqlite) driver:
 
 **db.ts**
 
 ```ts
 import { connect } from "@litdb/bun-sqlite"
 
-export const connection = connect("app.db") // WAL
-export const { $, sync:db, async } = connection
+export const connection = connect("app.db") // WAL enabled by default
+export const { $, sync:db, async, native } = connection
 ```
 
-> When needed use `native` to access underlying driver
+:::tip
+When needed use `native` to access underlying driver (e.g. [bun:sqlite Database](https://bun.sh/docs/api/sqlite#database))
+:::
 
 **app.ts**
 
