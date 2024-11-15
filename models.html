@@ -4,7 +4,7 @@
     <meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="icon" type="image/png" href="/img/favicon.png">
-    <title>Integrations</title>
+    <title>Models</title>
     <script>
     if (location.search === "?dark") localStorage.setItem('color-scheme','dark') 
     if (location.search === "?light") localStorage.removeItem('color-scheme') 
@@ -41,7 +41,7 @@
           </div>
             <div class="hidden sm:-my-px sm:ml-6 sm:flex sm:space-x-4 lg:space-x-8">
                 <!-- Current: "border-indigo-500 text-gray-900", Default: "border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700" -->
-                        <a href="/docs" class="inline-flex items-center border-b-2 px-1 pt-1 text-sm font-medium border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 dark:hover:text-gray-200">
+                        <a href="/overview" class="inline-flex items-center border-b-2 px-1 pt-1 text-sm font-medium border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 dark:hover:text-gray-200">
                             Documentation
                         </a>
                         <a href="https://github.com/litdb/litdb/discussions" class="inline-flex items-center border-b-2 px-1 pt-1 text-sm font-medium border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 dark:hover:text-gray-200">
@@ -76,7 +76,7 @@
     <div v-cloak v-if="open" class="sm:hidden">
         <div class="space-y-1 pb-3 pt-2">
             <!-- Current: "border-indigo-500 bg-indigo-50 text-indigo-700", Default: "border-transparent text-gray-600 hover:border-gray-300 hover:bg-gray-50 hover:text-gray-800" -->
-                    <a href="/docs" class="block border-l-4 py-2 pl-3 pr-4 text-base font-medium border-transparent text-gray-600 dark:text-gray-300 hover:border-gray-300 hover:bg-gray-50 dark:hover:bg-gray-900 hover:text-gray-800 dark:hover:text-gray-100">
+                    <a href="/overview" class="block border-l-4 py-2 pl-3 pr-4 text-base font-medium border-transparent text-gray-600 dark:text-gray-300 hover:border-gray-300 hover:bg-gray-50 dark:hover:bg-gray-900 hover:text-gray-800 dark:hover:text-gray-100">
                         Documentation
                     </a>
                     <a href="https://github.com/litdb/litdb/discussions" class="block border-l-4 py-2 pl-3 pr-4 text-base font-medium border-transparent text-gray-600 dark:text-gray-300 hover:border-gray-300 hover:bg-gray-50 dark:hover:bg-gray-900 hover:text-gray-800 dark:hover:text-gray-100">
@@ -128,59 +128,89 @@ mount('#header', Header)
             <div :class="['fixed bg-white dark:bg-black h-screen overflow-y-auto scrolling-touch overflow-hidden shadow lg:shadow-none transform transition-transform duration-200', open ? '' : 'translate-x-[-100%]']">
                 <nav class="sidebar lg:w-64 xl:w-80 px-1 pt-6 pb-16 overflow-y-auto font-medium text-sm lg:text-base sm:px-3 xl:px-5" aria-label="Sidebar">
                     <close-button title="Close Sidebar" class="lg:hidden -mr-2" v-on:close="open=false"></close-button>
-                                <a href="/creatorkit/" class="block flex items-center whitespace-nowrap">
+                                <a href="/" class="block flex items-center whitespace-nowrap">
 <svg class='h-6 w-6 shrink-0 text-sky-500' fill='none' viewBox='0 0 24 24' stroke-width='1.5' stroke='currentColor' aria-hidden='true'><path stroke-linecap='round' stroke-linejoin='round' d='M2.25 12l8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25'></path></svg>                                    <span class="p-2 pl-3 font-display font-medium text-slate-900 dark:text-white">
-Creator Kit                                    </span>
+Home                                    </span>
                                 </a>
                         <ul role="list" class="mb-6 mt-2 ml-3 space-y-2 border-l-2 border-slate-100 dark:border-slate-800 lg:mt-4 lg:space-y-4 lg:border-slate-200">
                                 <li class="relative">
-                                    <a href="/creatorkit/about" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
-                                        About
-                                    </a>
-                                </li>
-                                <li class="relative">
-                                    <a href="/creatorkit/install" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
-                                        Install
-                                    </a>
-                                </li>
-                                <li class="relative">
-                                    <a href="/creatorkit/customize" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
-                                        Customize
-                                    </a>
-                                </li>
-                                <li class="relative">
-                                    <a href="/creatorkit/components" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
-                                        Components
-                                    </a>
-                                </li>
-                                <li class="relative">
-                                    <a href="/creatorkit/integrations" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full active font-semibold text-sky-500 before:bg-sky-500">
-                                        Integrations
-                                    </a>
-                                </li>
-                        </ul>
-                                <h2 class="font-display font-medium text-slate-900 dark:text-white whitespace-nowrap">
-                                    Portal
-                                </h2>
-                        <ul role="list" class="mb-6 mt-2 ml-3 space-y-2 border-l-2 border-slate-100 dark:border-slate-800 lg:mt-4 lg:space-y-4 lg:border-slate-200">
-                                <li class="relative">
-                                    <a href="/creatorkit/portal-overview" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                    <a href="/overview" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
                                         Overview
                                     </a>
                                 </li>
                                 <li class="relative">
-                                    <a href="/creatorkit/portal-messages" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
-                                        Messages
+                                    <a href="/install" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        Install
                                     </a>
                                 </li>
                                 <li class="relative">
-                                    <a href="/creatorkit/portal-mailruns" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
-                                        Mail Runs
+                                    <a href="/models" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full active font-semibold text-sky-500 before:bg-sky-500">
+                                        Models
                                     </a>
                                 </li>
                                 <li class="relative">
-                                    <a href="/creatorkit/portal-posts" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
-                                        Posts
+                                    <a href="/bug-report" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        Report Issue
+                                    </a>
+                                </li>
+                        </ul>
+                                <h2 class="font-display font-medium text-slate-900 dark:text-white whitespace-nowrap">
+                                    Drivers
+                                </h2>
+                        <ul role="list" class="mb-6 mt-2 ml-3 space-y-2 border-l-2 border-slate-100 dark:border-slate-800 lg:mt-4 lg:space-y-4 lg:border-slate-200">
+                                <li class="relative">
+                                    <a href="/bun-sqlite" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        SQLite (Bun)
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/better-sqlite" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        SQLite (Node.js)
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/postgres" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        PostgreSQL
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/mysql2" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        MySQL
+                                    </a>
+                                </li>
+                        </ul>
+                                <h2 class="font-display font-medium text-slate-900 dark:text-white whitespace-nowrap">
+                                    Queries
+                                </h2>
+                        <ul role="list" class="mb-6 mt-2 ml-3 space-y-2 border-l-2 border-slate-100 dark:border-slate-800 lg:mt-4 lg:space-y-4 lg:border-slate-200">
+                                <li class="relative">
+                                    <a href="/schema" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        Schema
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/select" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        Select
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/joins" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        Joins
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/insert" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        Insert
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/update" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        Update
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/delete" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        Delete
                                     </a>
                                 </li>
                         </ul>
@@ -192,57 +222,157 @@ Creator Kit                                    </span>
                 
                     <section class="not-prose mb-16 md:mb-12">
                         <h1 class="text-4xl tracking-tight font-extrabold text-gray-900 dark:text-gray-50 sm:text-5xl md:text-6xl">
-                            Integrations
+                            Models
                         </h1>
                     </section>
 
                 <div class="not-prose"></div>
 
                 <div class="content">
-                    <p>We recommend your website have pages for the following <code>info.txt</code> collection variables:</p>
-<pre><code class="language-txt">MailPreferences   {‎{WebsiteBaseUrl}‎}/mail-preferences
-Unsubscribe       {‎{WebsiteBaseUrl}‎}/mail-preferences
-Privacy           {‎{WebsiteBaseUrl}‎}/privacy
-Contact           {‎{WebsiteBaseUrl}‎}/#contact
-SignupConfirmed   {‎{WebsiteBaseUrl}‎}/signup-confirmed
+                    <h2 id="fluent-api">Fluent API<a class="header-anchor" href="javascript:;" onclick="location.hash='#fluent-api'" aria-label="Permalink">&ZeroWidthSpace;</a></h2>
+<pre><code class="language-ts">import { Table } from 'litdb'
+
+export class Contact {
+    constructor(data?: Partial&lt;Contact&gt;) { Object.assign(this, data) }
+    id = 0
+    name = ''
+    age = 0 || undefined
+    email = ''
+    createdAt = new Date(2025,1,1)
+}
+class Order {
+    constructor(data?: Partial&lt;Order&gt;) { Object.assign(this, data) }
+    id = 0
+    contactId = 0
+    total = 0.0
+    createdAt = new Date()
+}
+class OrderItem {
+    constructor(data?: Partial&lt;OrderItem&gt;) { Object.assign(this, data) }
+    id = 0
+    orderId = 0
+    sku = ''
+    qty = 0
+    total = 0.0
+}
+class Product {
+    constructor(data?: Partial&lt;Product&gt;) { Object.assign(this, data) }
+    sku = ''
+    name = ''
+    cost = 0.0
+}
+
+Table(Contact, {
+    columns: {
+        id:        { type:&quot;INTEGER&quot;,  autoIncrement:true },
+        name:      { type:&quot;TEXT&quot;,     required:true },
+        age:       { type:&quot;INTEGER&quot; },
+        email:     { type:&quot;TEXT&quot;,     required:true, index:true, unique:true },
+        createdAt: { type:&quot;DATETIME&quot;, defaultValue:&quot;CURRENT_TIMESTAMP&quot; },
+    }
+})
+Table(Order, {
+    columns: {
+        id:        { type:&quot;INTEGER&quot;,  autoIncrement:true },
+        contactId: { type:&quot;INTEGER&quot;,  required:true, references:{ table:Contact, on:[&quot;DELETE&quot;,&quot;CASCADE&quot;] } },
+        total:     { type:&quot;MONEY&quot;,    required:true },
+        createdAt: { type:&quot;DATETIME&quot;, defaultValue:&quot;CURRENT_TIMESTAMP&quot; },
+    }
+})
+Table(OrderItem, {
+    columns: {
+        id:      { type:&quot;INTEGER&quot;, autoIncrement:true },
+        orderId: { type:&quot;INTEGER&quot;, required:true, references:{ table:Order,   on:[&quot;DELETE&quot;,&quot;RESTRICT&quot;] } },
+        sku:     { type:&quot;TEXT&quot;,    required:true, references:{ table:Product, on:[&quot;DELETE&quot;,&quot;RESTRICT&quot;] } },
+        qty:     { type:&quot;INTEGER&quot;, required:true },
+        total:   { type:&quot;MONEY&quot;,   required:true }
+    }
+})
+Table(Product, {
+    columns: {
+        sku:  { type:&quot;TEXT&quot;,  primaryKey:true },
+        name: { type:&quot;TEXT&quot;,  required:true, index:true, unique:true },
+        cost: { type:&quot;MONEY&quot;, required:true },
+    }
+})
 </code></pre>
-<p>You're also free to change the URLs in <code>info.txt</code> to reference existing pages on your website where they exist.</p>
-<p>The <code>info.SignupConfirmed</code> URL is redirected to after a contact verifies their email address.</p>
-<h2 id="example">Example<a class="header-anchor" href="javascript:;" onclick="location.hash='#example'" aria-label="Permalink">&ZeroWidthSpace;</a></h2>
-<p>For reference here are example pages Razor SSG uses for this URLs:</p>
-<table>
-<thead>
-<tr>
-<th>Page</th>
-<th>Source Code</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><a href="signup-confirmed">/signup-confirmed</a></td>
-<td><a href="https://github.com/NetCoreTemplates/razor-ssg/blob/main/MyApp/_pages/signup-confirmed.md">/_pages/signup-confirmed.md</a></td>
-</tr>
-<tr>
-<td><a href="mail-preferences">/mail-preferences</a></td>
-<td><a href="https://github.com/NetCoreTemplates/razor-ssg/blob/main/MyApp/_pages/mail-preferences.md">/_pages/mail-preferences.md</a></td>
-</tr>
-<tr>
-<td><a href="privacy">/privacy</a></td>
-<td><a href="https://github.com/NetCoreTemplates/razor-ssg/blob/main/MyApp/_pages/privacy.md">/_pages/privacy.md</a></td>
-</tr>
-<tr>
-<td><a href="community-rules">/community-rules</a></td>
-<td><a href="https://github.com/NetCoreTemplates/razor-ssg/blob/main/MyApp/_pages/community-rules.md">/_pages/community-rules.md</a></td>
-</tr>
-</tbody>
-</table>
+<h2 id="declarative-annotations">Declarative Annotations<a class="header-anchor" href="javascript:;" onclick="location.hash='#declarative-annotations'" aria-label="Permalink">&ZeroWidthSpace;</a></h2>
+<p>TypeScript or JS build systems that support <a href="https://github.com/tc39/proposal-decorators">TC39 decorators</a> can use the
+<code>@table</code> and <code>@column</code> decorators to define their data models, e.g:</p>
+<pre><code class="language-ts">import { table, column, DefaultValues } from 'litdb'
+
+@table()
+export class Contact {
+    constructor(data?: Partial&lt;Contact&gt;) { Object.assign(this, data) }
+
+    @column(&quot;INTEGER&quot;, { autoIncrement: true })
+    id = 0
+    
+    @column(&quot;TEXT&quot;, { required: true })
+    name = ''
+    
+    @column(&quot;INTEGER&quot;)
+    age?: number
+
+    @column(&quot;TEXT&quot;, { required:true, index:true, unique:true })
+    email = ''
+    
+    @column(&quot;DATETIME&quot;, { defaultValue:'CURRENT_TIMESTAMP' })
+    createdAt = new Date(2025,1,1)
+}
+
+@table()
+export class Order {
+    constructor(data?: Partial&lt;Order&gt;) { Object.assign(this, data) }
+
+    @column(&quot;INTEGER&quot;, { autoIncrement:true })
+    id: number = 0
+
+    @column(&quot;INTEGER&quot;, { required:true, references:{ table:Contact, on:[&quot;DELETE&quot;,&quot;CASCADE&quot;] } })
+    contactId: number = 0
+
+    @column(&quot;MONEY&quot;, { required:true})
+    total: number = 0
+
+    @column(&quot;DATETIME&quot;, { defaultValue:DefaultValues.NOW })
+    createdAt = new Date(2025,1,1)
+}
+
+@table()
+export class OrderItem {
+    @column(&quot;INTEGER&quot;, { autoIncrement:true })
+    id: number = 0
+
+    @column(&quot;INTEGER&quot;, { required:true, references:{ table:Order, on:[&quot;DELETE&quot;,&quot;RESTRICT&quot;] } })
+    orderId: number = 0
+
+    @column(&quot;TEXT&quot;, { required:true, references:{ table:Product, on:[&quot;DELETE&quot;,&quot;RESTRICT&quot;] } })
+    sku: string = ''
+
+    @column(&quot;INTEGER&quot;, { required:true })
+    qty: number = 0
+
+    @column(&quot;MONEY&quot;, { required:true })
+    total: number = 0
+}
+
+@table()
+class Product {
+    @column(&quot;TEXT&quot;, { primaryKey:true })
+    sku = ''
+    @column(&quot;TEXT&quot;, { required:true, index:true, unique:true })
+    name = ''
+    @column(&quot;MONEY&quot;, { required:true })
+    cost = 0.0
+}
+</code></pre>
 
                 </div>
 
                 <div class="not-prose"></div>
                 
                     <div class="not-prose py-8">
-                        <a class="text-slate-500 font-semibold hover:text-indigo-600 flex items-center" href="https://github.com/litdb/litdb.dev/blob/main/MyApp/_pages/creatorkit/integrations.md" target="_blank" rel="noopener noreferrer">
+                        <a class="text-slate-500 font-semibold hover:text-indigo-600 flex items-center" href="https://github.com/litdb/litdb.dev/blob/main/MyApp/_pages/models.md" target="_blank" rel="noopener noreferrer">
                             Edit this page on GitHub<svg class="ml-1 inline-block w-4 h-4" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" data-v-1ed99556=""><path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"></path><polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"></polygon></svg>
                         </a>
                     </div>
@@ -250,18 +380,18 @@ SignupConfirmed   {‎{WebsiteBaseUrl}‎}/signup-confirmed
                     <div class="not-prose my-20">
                                 <nav class="flex items-center justify-between border-t border-gray-200 dark:border-gray-700 px-4 sm:px-0">
                                     <div class="-mt-px flex w-0 flex-1">
-                                            <a href="/creatorkit/components" class="inline-flex items-center border-t-2 border-transparent pt-4 pr-1 text-sm font-medium text-gray-500 hover:border-gray-300 dark:hover:border-gray-600 hover:text-gray-700 dark:hover:text-gray-200">
+                                            <a href="/install" class="inline-flex items-center border-t-2 border-transparent pt-4 pr-1 text-sm font-medium text-gray-500 hover:border-gray-300 dark:hover:border-gray-600 hover:text-gray-700 dark:hover:text-gray-200">
                                                 <!-- Heroicon name: mini/arrow-long-left -->
                                                 <svg class="mr-3 h-5 w-5 text-gray-500" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
                                                     <path fill-rule="evenodd" d="M18 10a.75.75 0 01-.75.75H4.66l2.1 1.95a.75.75 0 11-1.02 1.1l-3.5-3.25a.75.75 0 010-1.1l3.5-3.25a.75.75 0 111.02 1.1l-2.1 1.95h12.59A.75.75 0 0118 10z" clip-rule="evenodd"></path>
                                                 </svg>
-                                                Components
+                                                Install
                                             </a>
                                     </div>
                                     <div class="hidden md:-mt-px md:flex"></div>
                                     <div class="-mt-px flex w-0 flex-1 justify-end">
-                                            <a href="/creatorkit/portal-overview" class="inline-flex items-center border-t-2 border-transparent pt-4 pl-1 text-sm font-medium text-gray-500 hover:border-gray-300 dark:hover:border-gray-600 hover:text-gray-700 dark:hover:text-gray-200">
-                                                Overview
+                                            <a href="/bug-report" class="inline-flex items-center border-t-2 border-transparent pt-4 pl-1 text-sm font-medium text-gray-500 hover:border-gray-300 dark:hover:border-gray-600 hover:text-gray-700 dark:hover:text-gray-200">
+                                                Report Issue
                                                 <!-- Heroicon name: mini/arrow-long-right -->
                                                 <svg class="ml-3 h-5 w-5 text-gray-500" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
                                                     <path fill-rule="evenodd" d="M2 10a.75.75 0 01.75-.75h12.59l-2.1-1.95a.75.75 0 111.02-1.1l3.5 3.25a.75.75 0 010 1.1l-3.5 3.25a.75.75 0 11-1.02-1.1l2.1-1.95H2.75A.75.75 0 012 10z" clip-rule="evenodd"></path>
@@ -280,8 +410,13 @@ SignupConfirmed   {‎{WebsiteBaseUrl}‎}/signup-confirmed
                             </h5>
                             <ul class="text-slate-700 text-sm leading-6">
                                     <li class="group text-gray-800 hover:text-gray-900">
-                                        <span v-hash="'#example'" data-id="example" class="cursor-pointer font-medium block text-sm transform transition-colors duration-200 py-2">
-                                            Example
+                                        <span v-hash="'#fluent-api'" data-id="fluent-api" class="cursor-pointer font-medium block text-sm transform transition-colors duration-200 py-2">
+                                            Fluent API
+                                        </span>
+                                    </li>
+                                    <li class="group text-gray-800 hover:text-gray-900">
+                                        <span v-hash="'#declarative-annotations'" data-id="declarative-annotations" class="cursor-pointer font-medium block text-sm transform transition-colors duration-200 py-2">
+                                            Declarative Annotations
                                         </span>
                                     </li>
                             </ul>
