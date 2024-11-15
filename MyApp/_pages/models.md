@@ -1,0 +1,149 @@
+---
+title: Models
+---
+
+
+
+## Fluent API
+
+```ts
+import { Table } from 'litdb'
+
+export class Contact {
+    constructor(data?: Partial<Contact>) { Object.assign(this, data) }
+    id = 0
+    name = ''
+    age = 0 || undefined
+    email = ''
+    createdAt = new Date(2025,1,1)
+}
+class Order {
+    constructor(data?: Partial<Order>) { Object.assign(this, data) }
+    id = 0
+    contactId = 0
+    total = 0.0
+    createdAt = new Date()
+}
+class OrderItem {
+    constructor(data?: Partial<OrderItem>) { Object.assign(this, data) }
+    id = 0
+    orderId = 0
+    sku = ''
+    qty = 0
+    total = 0.0
+}
+class Product {
+    constructor(data?: Partial<Product>) { Object.assign(this, data) }
+    sku = ''
+    name = ''
+    cost = 0.0
+}
+
+Table(Contact, {
+    columns: {
+        id:        { type:"INTEGER",  autoIncrement:true },
+        name:      { type:"TEXT",     required:true },
+        age:       { type:"INTEGER" },
+        email:     { type:"TEXT",     required:true, index:true, unique:true },
+        createdAt: { type:"DATETIME", defaultValue:"CURRENT_TIMESTAMP" },
+    }
+})
+Table(Order, {
+    columns: {
+        id:        { type:"INTEGER",  autoIncrement:true },
+        contactId: { type:"INTEGER",  required:true, references:{ table:Contact, on:["DELETE","CASCADE"] } },
+        total:     { type:"MONEY",    required:true },
+        createdAt: { type:"DATETIME", defaultValue:"CURRENT_TIMESTAMP" },
+    }
+})
+Table(OrderItem, {
+    columns: {
+        id:      { type:"INTEGER", autoIncrement:true },
+        orderId: { type:"INTEGER", required:true, references:{ table:Order,   on:["DELETE","RESTRICT"] } },
+        sku:     { type:"TEXT",    required:true, references:{ table:Product, on:["DELETE","RESTRICT"] } },
+        qty:     { type:"INTEGER", required:true },
+        total:   { type:"MONEY",   required:true }
+    }
+})
+Table(Product, {
+    columns: {
+        sku:  { type:"TEXT",  primaryKey:true },
+        name: { type:"TEXT",  required:true, index:true, unique:true },
+        cost: { type:"MONEY", required:true },
+    }
+})
+```
+
+## Declarative Annotations
+
+TypeScript or JS build systems that support [TC39 decorators](https://github.com/tc39/proposal-decorators) can use the 
+`@table` and `@column` decorators to define their data models, e.g: 
+
+```ts
+import { table, column, DefaultValues } from 'litdb'
+
+@table()
+export class Contact {
+    constructor(data?: Partial<Contact>) { Object.assign(this, data) }
+
+    @column("INTEGER", { autoIncrement: true })
+    id = 0
+    
+    @column("TEXT", { required: true })
+    name = ''
+    
+    @column("INTEGER")
+    age?: number
+
+    @column("TEXT", { required:true, index:true, unique:true })
+    email = ''
+    
+    @column("DATETIME", { defaultValue:'CURRENT_TIMESTAMP' })
+    createdAt = new Date(2025,1,1)
+}
+
+@table()
+export class Order {
+    constructor(data?: Partial<Order>) { Object.assign(this, data) }
+
+    @column("INTEGER", { autoIncrement:true })
+    id: number = 0
+
+    @column("INTEGER", { required:true, references:{ table:Contact, on:["DELETE","CASCADE"] } })
+    contactId: number = 0
+
+    @column("MONEY", { required:true})
+    total: number = 0
+
+    @column("DATETIME", { defaultValue:DefaultValues.NOW })
+    createdAt = new Date(2025,1,1)
+}
+
+@table()
+export class OrderItem {
+    @column("INTEGER", { autoIncrement:true })
+    id: number = 0
+
+    @column("INTEGER", { required:true, references:{ table:Order, on:["DELETE","RESTRICT"] } })
+    orderId: number = 0
+
+    @column("TEXT", { required:true, references:{ table:Product, on:["DELETE","RESTRICT"] } })
+    sku: string = ''
+
+    @column("INTEGER", { required:true })
+    qty: number = 0
+
+    @column("MONEY", { required:true })
+    total: number = 0
+}
+
+@table()
+class Product {
+    @column("TEXT", { primaryKey:true })
+    sku = ''
+    @column("TEXT", { required:true, index:true, unique:true })
+    name = ''
+    @column("MONEY", { required:true })
+    cost = 0.0
+}
+```

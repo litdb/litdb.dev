@@ -1,57 +1,73 @@
 [
   {
-    "text": "Introduction",
+    "text": "Home",
     "link": "/",
     "children": [
       {
-        "text": "What is Razor Press?",
-        "link": "/what-is-razor-press"
+        "text": "Overview",
+        "link": "/overview"
       },
       {
-        "text": "Structure",
-        "link": "/structure"
+        "text": "Install",
+        "link": "/install"
       },
       {
-        "text": "Static Site Generation",
-        "link": "/ssg"
+        "text": "Models",
+        "link": "/models"
       },
       {
-        "text": "Deployments",
-        "link": "/deployments"
+        "text": "Report Issue",
+        "link": "/bug-report"
       }
     ]
   },
   {
-    "text": "Markdown",
+    "text": "Drivers",
     "children": [
       {
-        "text": "Markdown Syntax",
-        "link": "/syntax"
+        "text": "SQLite (Bun)",
+        "link": "/bun-sqlite"
       },
       {
-        "text": "Markdown Containers",
-        "link": "/containers"
+        "text": "SQLite (Node.js)",
+        "link": "/better-sqlite"
       },
       {
-        "text": "Using Vue in Markdown",
-        "link": "/vue-in-markdown"
+        "text": "PostgreSQL",
+        "link": "/postgres"
+      },
+      {
+        "text": "MySQL",
+        "link": "/mysql2"
       }
     ]
   },
   {
-    "text": "Features",
+    "text": "Queries",
     "children": [
       {
-        "text": "Sidebars",
-        "link": "/sidebars"
+        "text": "Schema",
+        "link": "/schema"
       },
       {
-        "text": "Redirects",
-        "link": "/redirects"
+        "text": "Select",
+        "link": "/select"
       },
       {
-        "text": "Typesense Real-Time Search",
-        "link": "/typesense"
+        "text": "Joins",
+        "link": "/joins"
+      },
+      {
+        "text": "Insert",
+        "link": "/insert"
+      },
+      {
+        "text": "Update",
+        "link": "/update"
+      },
+      {
+        "text": "Delete",
+        "link": "/delete"
       }
     ]
   }

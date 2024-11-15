@@ -2,14 +2,8 @@
 title: Documentation
 ---
 
-## ServiceStack Community
+## litdb Links
 
-- [servicestack.net/discord](https://servicestack.net/discord) - Join **#ServiceStack** Discord Channel
-- [servicestack.net/discuss](https://servicestack.net/discuss) - ServiceStack Community GitHub Discussions
-    - [servicestack.net/ask](https://servicestack.net/ask) - Q & A Community Support
-    - [servicestack.net/ideas](https://servicestack.net/ideas) - Submit Ideas & Feature Requests
-
-## Contributing
-
-- [Contributing Guide](https://docs.servicestack.net/contributing) - Read our Contributing Guide
-- [Contribution License Agreement](https://docs.google.com/forms/d/16Op0fmKaqYtxGL4sg7w_g-cXXyCoWjzppgkuqzOeKyk/viewform) - Please sign our CLA before Contributing
+- [litdb.dev/discuss](https://github.com/litdb/litdb/discussions) - litdb Community GitHub Discussions
+  - [litdb.dev/ideas](https://github.com/litdb/litdb/discussions/categories/ideas) - Submit Ideas & Feature Requests
+- [litdb.dev/issues](https://github.com/litdb/litdb/issues) - Report an Issue

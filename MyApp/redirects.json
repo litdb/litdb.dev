@@ -1,4 +1,5 @@
 {
-    "/creatorkit": "/creatorkit/",
-    "/vue": "/vue/"
+    "/discuss": "https://github.com/litdb/litdb/discussions",
+    "/ideas": "https://github.com/litdb/litdb/discussions/categories/ideas",
+    "/issues": "https://github.com/litdb/litdb/issues"
 }

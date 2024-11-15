@@ -29,4 +29,8 @@
     <PackageReference Include="Microsoft.AspNetCore.Mvc.Razor.RuntimeCompilation" Version="8.*" />
   </ItemGroup>
 
+  <ItemGroup>
+    <_ContentIncludedByDefault Remove="_pages\vue\sidebar.json" />
+  </ItemGroup>
+
 </Project>
