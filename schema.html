@@ -200,6 +200,11 @@ Home                                    </span>
                                     </a>
                                 </li>
                                 <li class="relative">
+                                    <a href="/where" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        Where
+                                    </a>
+                                </li>
+                                <li class="relative">
                                     <a href="/insert" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
                                         Insert
                                     </a>
@@ -230,7 +235,9 @@ Home                                    </span>
                 <div class="not-prose"></div>
 
                 <div class="content">
-                    <p>Using data models defined in <a href="/models">/models</a>.</p>
+                    <div class="info custom-block">
+            <p class="custom-block-title">INFO</p><p>All live examples use the data models defined in <a href="/models">/models</a>.</p>
+</div>
 <h2 id="create-table">Create Table<a class="header-anchor" href="javascript:;" onclick="location.hash='#create-table'" aria-label="Permalink">&ZeroWidthSpace;</a></h2>
 <live-preview>
 db.createTable(Contact)

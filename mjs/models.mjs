@@ -6,7 +6,8 @@ export class Contact {
     name = ''
     age = 0 || undefined
     email = ''
-    createdAt = new Date(2025,1,1)
+    city = '' || undefined
+    createdAt = new Date()
 }
 export class Order {
     constructor(data) { Object.assign(this, data) }
@@ -36,6 +37,7 @@ Table(Contact, {
         name:      { type:"TEXT",     required:true },
         age:       { type:"INTEGER" },
         email:     { type:"TEXT",     required:true, index:true, unique:true },
+        city:      { type:"TEXT" },
         createdAt: { type:"DATETIME", defaultValue:"CURRENT_TIMESTAMP" },
     }
 })

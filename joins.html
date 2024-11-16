@@ -200,6 +200,11 @@ Home                                    </span>
                                     </a>
                                 </li>
                                 <li class="relative">
+                                    <a href="/where" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        Where
+                                    </a>
+                                </li>
+                                <li class="relative">
                                     <a href="/insert" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
                                         Insert
                                     </a>
@@ -230,7 +235,58 @@ Home                                    </span>
                 <div class="not-prose"></div>
 
                 <div class="content">
-                    
+                    <h2 id="simple-join">Simple Join<a class="header-anchor" href="javascript:;" onclick="location.hash='#simple-join'" aria-label="Permalink">&ZeroWidthSpace;</a></h2>
+<p>Use <code>join</code> to create a new query builder with an additional table join. The <code>on</code> option is used to specify the join condition.</p>
+<live-preview>
+$.from(Contact).join(Order, { on:(c,o) => $`${c.id} = ${o.contactId}` }).select('*')
+</live-preview>
+<h2 id="custom-join-types">Custom Join Types<a class="header-anchor" href="javascript:;" onclick="location.hash='#custom-join-types'" aria-label="Permalink">&ZeroWidthSpace;</a></h2>
+<p>Use <code>leftJoin</code>, <code>rightJoin</code>, <code>fullJoin</code>, <code>crossJoin</code> to create a new query builder with a specific join type.</p>
+<live-preview>
+db.all($.from(Contact).leftJoin(Order, { on:(c,o) => $`${c.id} = ${o.contactId}` }).select('*'))
+db.all($.from(Contact).rightJoin(Order, { on:(c,o) => $`${c.id} = ${o.contactId}` }).select('*'))
+db.all($.from(Contact).fullJoin(Order, { on:(c,o) => $`${c.id} = ${o.contactId}` }).select('*'))
+db.all($.from(Contact).crossJoin(Order, { on:(c,o) => $`${c.id} = ${o.contactId}` }).select('*'))
+</live-preview>
+<h2 id="multiple-joins">Multiple Joins<a class="header-anchor" href="javascript:;" onclick="location.hash='#multiple-joins'" aria-label="Permalink">&ZeroWidthSpace;</a></h2>
+<p>Multiple joins can be chained together to create complex queries. A new query builder is created for each join
+that's added containing references for all tables in the query in the order they were added.</p>
+<p>These references can be used in <code>where</code>, <code>select</code>, <code>groupBy</code>, <code>orderBy</code> methods to reference columns from each table.</p>
+<live-preview>
+$.from(Order)
+  .leftJoin(Contact, { on:(o,c) => $`${o.contactId} = ${c.id}` })
+  .join(OrderItem,   { on:(_,i,o) => $`${i.orderId} = ${o.id}` })
+  .leftJoin(Product, { on:(i,p) => $`${i.sku} = ${p.sku}` })
+  .where((o,c,i,p) => $`${c.id} = ${1} AND ${p.cost} > ${100}`)
+  .select((o,c,i,p) => $`${o.id}, ${c.name}, ${i.qty}, ${p.name}`)
+</live-preview>
+<h2 id="aliases">Aliases<a class="header-anchor" href="javascript:;" onclick="location.hash='#aliases'" aria-label="Permalink">&ZeroWidthSpace;</a></h2>
+<p>Each joined table can be assigned an alias using the <code>as</code> option. This alias is then used to reference the table in the query.</p>
+<live-preview>
+$.from(Order,'o')
+  .leftJoin(Contact, { on:(o,c) => $`${o.contactId} = ${c.id}`, as:'c' })
+  .join(OrderItem, { on:(_,i,o) => $`${i.orderId} = ${o.id}`, as:'i' })
+  .leftJoin(Product, { on:(i,p) => $`${i.sku} = ${p.sku}`, as:'p' })
+  .where((o,c,i,p) => $`${c.id} = ${1} AND ${p.cost} > ${100}`)
+  .select((o,c,i,p) => $`${o.id}, ${c.name}, ${i.qty}, ${p.name}`)
+</live-preview>
+<h2 id="external-references">External References<a class="header-anchor" href="javascript:;" onclick="location.hash='#external-references'" aria-label="Permalink">&ZeroWidthSpace;</a></h2>
+<p>Queries can be joined on external references which can be used across multiple query builders that can be composed together
+to create complex queries that reference other queries.</p>
+<live-preview>
+const [ o, c, i, p ] = [ 
+  $.ref(Order,'o'), $.ref(Contact,'c'), $.ref(OrderItem,'i'), $.ref(Product,'p') ]
+const recentOrder = $.from(Order,'o2')
+  .where(o2 => $`${o2.contactId} = ${c.id}`)
+  .select(o2 => $`MAX(${o2.createdAt})`)
+db.all($.from(o)
+  .leftJoin(c, { on:(o,c) => $`${o.contactId} = ${c.id}`, as:'c' })
+  .join(i, { on:(_,i,o) => $`${i.orderId} = ${o.id}`, as:'i' })
+  .leftJoin(p, { on:(i,p) => $`${i.sku} = ${p.sku}`, as:'p' })
+  .where`${o.createdAt} = (${recentOrder})`
+  .select`${o.id}, ${c.name}, ${i.qty}, ${p.name}`)
+</live-preview>
+
                 </div>
 
                 <div class="not-prose"></div>
@@ -254,8 +310,8 @@ Home                                    </span>
                                     </div>
                                     <div class="hidden md:-mt-px md:flex"></div>
                                     <div class="-mt-px flex w-0 flex-1 justify-end">
-                                            <a href="/insert" class="inline-flex items-center border-t-2 border-transparent pt-4 pl-1 text-sm font-medium text-gray-500 hover:border-gray-300 dark:hover:border-gray-600 hover:text-gray-700 dark:hover:text-gray-200">
-                                                Insert
+                                            <a href="/where" class="inline-flex items-center border-t-2 border-transparent pt-4 pl-1 text-sm font-medium text-gray-500 hover:border-gray-300 dark:hover:border-gray-600 hover:text-gray-700 dark:hover:text-gray-200">
+                                                Where
                                                 <!-- Heroicon name: mini/arrow-long-right -->
                                                 <svg class="ml-3 h-5 w-5 text-gray-500" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
                                                     <path fill-rule="evenodd" d="M2 10a.75.75 0 01.75-.75h12.59l-2.1-1.95a.75.75 0 111.02-1.1l3.5 3.25a.75.75 0 010 1.1l-3.5 3.25a.75.75 0 11-1.02-1.1l2.1-1.95H2.75A.75.75 0 012 10z" clip-rule="evenodd"></path>
@@ -266,6 +322,42 @@ Home                                    </span>
                     </div>
             </div>
                 
+                <div class="docmap hidden 2xl:block flex-none w-64 pl-8 mr-8">
+                    <div class="fixed bg-white dark:bg-black flex flex-col overflow-y-auto pt-10 px-8 pb-6" style="height:calc(100vh - 50px);">
+                        <div>
+                            <h5 class="text-slate-900 font-semibold mb-4 text-sm leading-6 dark:text-slate-100">
+                                On This Page
+                            </h5>
+                            <ul class="text-slate-700 text-sm leading-6">
+                                    <li class="group text-gray-800 hover:text-gray-900">
+                                        <span v-hash="'#simple-join'" data-id="simple-join" class="cursor-pointer font-medium block text-sm transform transition-colors duration-200 py-2">
+                                            Simple Join
+                                        </span>
+                                    </li>
+                                    <li class="group text-gray-800 hover:text-gray-900">
+                                        <span v-hash="'#custom-join-types'" data-id="custom-join-types" class="cursor-pointer font-medium block text-sm transform transition-colors duration-200 py-2">
+                                            Custom Join Types
+                                        </span>
+                                    </li>
+                                    <li class="group text-gray-800 hover:text-gray-900">
+                                        <span v-hash="'#multiple-joins'" data-id="multiple-joins" class="cursor-pointer font-medium block text-sm transform transition-colors duration-200 py-2">
+                                            Multiple Joins
+                                        </span>
+                                    </li>
+                                    <li class="group text-gray-800 hover:text-gray-900">
+                                        <span v-hash="'#aliases'" data-id="aliases" class="cursor-pointer font-medium block text-sm transform transition-colors duration-200 py-2">
+                                            Aliases
+                                        </span>
+                                    </li>
+                                    <li class="group text-gray-800 hover:text-gray-900">
+                                        <span v-hash="'#external-references'" data-id="external-references" class="cursor-pointer font-medium block text-sm transform transition-colors duration-200 py-2">
+                                            External References
+                                        </span>
+                                    </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
                 
         </div>
     </div>    

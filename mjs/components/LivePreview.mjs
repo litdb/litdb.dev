@@ -2,7 +2,7 @@ import { onMounted, ref, nextTick } from "vue"
 import * as litdb from "litdb"
 import * as models from "../models.mjs"
 
-const { Sqlite, DbConnection, SyncDbConnection, IS } = litdb
+const { Sqlite, DbConnection, SyncDbConnection, IS, Inspect } = litdb
 
 class SqlCaptureStatement {
     constructor(sql, params, log) {
@@ -142,9 +142,10 @@ export default {
                     const isExpr = props.expr || !code.value.includes('db.')
                     const ret = scopedExpr(code.value, ctx, isExpr)
                     console.log(connection.log)
-                    sql.value = connection.log.map(x => x.sql).join('\n')
+                    sql.value = connection.log.map(x => x.sql.trim()).join('\n\n')
                     if (ret) {
-                        sql.value += `${ret}`
+                        const str = `${ret}` 
+                        sql.value += (str !== '[object Object]' ? str : Inspect.dump(ret))
                     }
                     nextTick(() => globalThis.hljs.highlightElement(refPreview.value))
                 } catch(e) {

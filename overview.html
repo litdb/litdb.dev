@@ -200,6 +200,11 @@ Home                                    </span>
                                     </a>
                                 </li>
                                 <li class="relative">
+                                    <a href="/where" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        Where
+                                    </a>
+                                </li>
+                                <li class="relative">
                                     <a href="/insert" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
                                         Insert
                                     </a>
@@ -237,9 +242,23 @@ constructing and executing typed SQL queries with a focus on type safety, best p
 <h3 id="litdb-library">litdb library<a class="header-anchor" href="javascript:;" onclick="location.hash='#litdb-library'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
 <p>The core <code>litdb</code> library provides a set of composable query builders and SQL fragments that can be used to generate
 SQL that can be executed on SQLite, MySQL and PostgreSQL.</p>
+<h3 id="sql-expression">SQL Expression<a class="header-anchor" href="javascript:;" onclick="location.hash='#sql-expression'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
+<p>The <code>$</code> tagged template function is used to create parameterized SQL Fragments that's split into <code>sql</code> and <code>params</code>:</p>
+<pre><code class="language-ts">type Fragment = { sql:string, params:Record&lt;string,any&gt; }
+</code></pre>
+<live-preview>
+JSON.stringify($`id = ${1} OR name = ${'John'}`)
+</live-preview>
+<h3 id="sql-builder">SQL Builder<a class="header-anchor" href="javascript:;" onclick="location.hash='#sql-builder'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
+<p>SQL Builders are just objects containing a <code>build()</code> function which returns a SQL <code>Fragment</code>:</p>
+<pre><code class="language-ts">interface SqlBuilder {
+    build(): Fragment
+}
+</code></pre>
+<p>Their simplicity and loose coupling allows them to be used in any ORM or driver that can execute parameterized SQL.</p>
 <h3 id="litdb-drivers">litdb drivers<a class="header-anchor" href="javascript:;" onclick="location.hash='#litdb-drivers'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
 <p>The litdb Drivers provide a unified interface for executing custom parameterized SQL, SQL Builders and SQL Fragments
-for their respective driver implementation. The SQLite drivers support both the Sync and Async DbConnection whilst
+for their respective RDBMS. The SQLite drivers support both the Sync and Async DbConnection whilst
 remote databases like PostgreSQL and MySQL only support the Async DbConnection.</p>
 <pre><code class="language-ts">interface SyncDbConnection {
     driver:Driver
@@ -342,6 +361,18 @@ expressiveness of your RDBMS SQL to make use of RDBMS-specific features when nee
                                                         <span v-hash="'#litdb-library'" class="cursor-pointer flex text-sm transform transition-colors duration-200 py-2">
                                                             <svg width="3" height="24" viewBox="0 -9 3 24" class="mr-2 overflow-visible"><path d="M0 0L3 3L0 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path></svg>
                                                             litdb library
+                                                        </span>
+                                                    </li>
+                                                    <li data-id="sql-expression" class="text-gray-500 hover:text-gray-900">
+                                                        <span v-hash="'#sql-expression'" class="cursor-pointer flex text-sm transform transition-colors duration-200 py-2">
+                                                            <svg width="3" height="24" viewBox="0 -9 3 24" class="mr-2 overflow-visible"><path d="M0 0L3 3L0 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path></svg>
+                                                            SQL Expression
+                                                        </span>
+                                                    </li>
+                                                    <li data-id="sql-builder" class="text-gray-500 hover:text-gray-900">
+                                                        <span v-hash="'#sql-builder'" class="cursor-pointer flex text-sm transform transition-colors duration-200 py-2">
+                                                            <svg width="3" height="24" viewBox="0 -9 3 24" class="mr-2 overflow-visible"><path d="M0 0L3 3L0 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path></svg>
+                                                            SQL Builder
                                                         </span>
                                                     </li>
                                                     <li data-id="litdb-drivers" class="text-gray-500 hover:text-gray-900">

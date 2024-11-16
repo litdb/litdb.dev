@@ -200,6 +200,11 @@ Home                                    </span>
                                     </a>
                                 </li>
                                 <li class="relative">
+                                    <a href="/where" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        Where
+                                    </a>
+                                </li>
+                                <li class="relative">
                                     <a href="/insert" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
                                         Insert
                                     </a>
@@ -238,7 +243,7 @@ const id = 1
 db.all`SELECT * FROM Contact`                     // => Contact[]
 db.one`SELECT * FROM Contact WHERE id = ${id}`    // => Contact
 db.value`SELECT COUNT(*) FROM Contact`            // => number
-db.column`SELECT firstName FROM Contact`          // => string[]
+db.column`SELECT name FROM Contact`               // => string[]
 db.arrays`SELECT * FROM Contact`                  // => any[][]
 db.array`SELECT * FROM Contact WHERE id = ${id}`  // => any[]
 </live-preview>
@@ -246,6 +251,28 @@ db.array`SELECT * FROM Contact WHERE id = ${id}`  // => any[]
 <p><code>$.from(Table)</code> is used to create a SELECT query builder which by default selects all known columns of the data model.</p>
 <live-preview>
 $.from(Contact)
+</live-preview>
+<h2 id="typed-selects">Typed Selects<a class="header-anchor" href="javascript:;" onclick="location.hash='#typed-selects'" aria-label="Permalink">&ZeroWidthSpace;</a></h2>
+<p>When a custom select is needed you can use select function to specify the columns to select. All tables and columns
+using typed references are automatically quoted.</p>
+<live-preview>
+$.from(Contact).select(c => $`${c.id}, ${c.name}, ${c.email}`)
+</live-preview>
+<h2 id="aliases">Aliases<a class="header-anchor" href="javascript:;" onclick="location.hash='#aliases'" aria-label="Permalink">&ZeroWidthSpace;</a></h2>
+<p>A table alias can be specified in <code>$.from()</code>, with the <code>.as()</code> method or by using <code>$.ref()</code> to
+create a table reference.</p>
+<live-preview>
+db.all($.from(Contact,'c').select(c => $`${c.id}, ${c.name}, ${c.email}`))
+db.all($.from(Contact).as('c').select(c => $`${c.id}, ${c.name}, ${c.age}`))
+const c = $.ref(Contact,'c')
+db.all($.from(c).select(c => $`${c.id}, ${c.name}, ${c.createdAt}`))
+</live-preview>
+<h2 id="select-a-list-of-properties-or-columns">Select a list of Properties or Columns<a class="header-anchor" href="javascript:;" onclick="location.hash='#select-a-list-of-properties-or-columns'" aria-label="Permalink">&ZeroWidthSpace;</a></h2>
+<p>The <code>props</code> option can be used to select a list of properties from the data model where any aliases would be used if defined,
+whilst the <code>columns</code> option can be used to select a list of RDBMS columns from the table.</p>
+<live-preview>
+db.all($.from(Contact).select({ props:['id', 'name', 'age'] }))
+db.all($.from(Contact).select({ columns:['id', 'name', 'email'] }))
 </live-preview>
 
                 </div>
@@ -298,6 +325,21 @@ $.from(Contact)
                                     <li class="group text-gray-800 hover:text-gray-900">
                                         <span v-hash="'#select-query-builder'" data-id="select-query-builder" class="cursor-pointer font-medium block text-sm transform transition-colors duration-200 py-2">
                                             SELECT Query Builder
+                                        </span>
+                                    </li>
+                                    <li class="group text-gray-800 hover:text-gray-900">
+                                        <span v-hash="'#typed-selects'" data-id="typed-selects" class="cursor-pointer font-medium block text-sm transform transition-colors duration-200 py-2">
+                                            Typed Selects
+                                        </span>
+                                    </li>
+                                    <li class="group text-gray-800 hover:text-gray-900">
+                                        <span v-hash="'#aliases'" data-id="aliases" class="cursor-pointer font-medium block text-sm transform transition-colors duration-200 py-2">
+                                            Aliases
+                                        </span>
+                                    </li>
+                                    <li class="group text-gray-800 hover:text-gray-900">
+                                        <span v-hash="'#select-a-list-of-properties-or-columns'" data-id="select-a-list-of-properties-or-columns" class="cursor-pointer font-medium block text-sm transform transition-colors duration-200 py-2">
+                                            Select a list of Properties or Columns
                                         </span>
                                     </li>
                             </ul>
