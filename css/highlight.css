@@ -25,13 +25,13 @@ pre code.hljs{display:block;overflow-x:auto;padding:1em}code.hljs{padding:3px 5p
 /*highlightjs*/
 .hljs, .dark .hljs, .prose :where(pre):not(:where([class~="not-prose"] *)) .hljs {
     color: #e5e7eb !important;
-    background-color: #282c34 !important;
+    background-color: #1e1e2e !important;
 }
 .hljs-comment, .hljs-quote {
     color: rgb(148 163 184) !important; /*text-slate-400*/
 }
 
-pre {
+:where(pre):not(:where([class~="not-prose"] *)) {
     overflow-x: auto;
     font-weight: 400;
     font-size: .875em;
@@ -42,7 +42,7 @@ pre {
     padding: .8571429em 1.1428571em;
     max-width: calc(100vw - 1rem);
     min-width: fit-content;
-    background-color: #282c34 !important;
+    background-color: #1e1e2e !important;
 }
 pre code.hljs {
     display: block;

@@ -22,7 +22,8 @@
         "app.mjs": "/mjs/app.mjs",
         "vue": "/lib/mjs/vue.min.mjs",
         "@servicestack/client": "/lib/mjs/servicestack-client.min.mjs",
-        "@servicestack/vue": "/lib/mjs/servicestack-vue.min.mjs"
+        "@servicestack/vue": "/lib/mjs/servicestack-vue.min.mjs",
+        "litdb": "/lib/mjs/litdb.min.js"
     }
 }
 </script>
@@ -406,6 +407,7 @@ await db.exec($.deleteFrom(Contact).where(hasId(jane.id))) // query builder
     </div>    
 </div>
 
+
 <script>
 //doc instructions
 if (document.querySelector('.hide-title')) {
@@ -443,7 +445,7 @@ mount('#sidebar', Sidebar)
 <script>hljs.highlightAll()</script>
 <script src="/lib/js/lite-yt-embed.js"></script>
 <script src="/mjs/docs.mjs" type="module"></script>
-
+    
 
     </main>
 </div>

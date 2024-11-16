@@ -22,7 +22,8 @@
         "app.mjs": "/mjs/app.mjs",
         "vue": "/lib/mjs/vue.min.mjs",
         "@servicestack/client": "/lib/mjs/servicestack-client.min.mjs",
-        "@servicestack/vue": "/lib/mjs/servicestack-vue.min.mjs"
+        "@servicestack/vue": "/lib/mjs/servicestack-vue.min.mjs",
+        "litdb": "/lib/mjs/litdb.min.js"
     }
 }
 </script>
@@ -229,7 +230,19 @@ Home                                    </span>
                 <div class="not-prose"></div>
 
                 <div class="content">
-                    
+                    <p>Using data models defined in <a href="/models">/models</a>.</p>
+<h2 id="create-table">Create Table<a class="header-anchor" href="javascript:;" onclick="location.hash='#create-table'" aria-label="Permalink">&ZeroWidthSpace;</a></h2>
+<live-preview>
+db.createTable(Contact)
+db.createTable(Order)
+db.createTable(OrderItem)
+db.createTable(Product)
+</live-preview>
+<h2 id="drop-table">Drop Table<a class="header-anchor" href="javascript:;" onclick="location.hash='#drop-table'" aria-label="Permalink">&ZeroWidthSpace;</a></h2>
+<live-preview>
+db.dropTable(Contact)
+</live-preview>
+
                 </div>
 
                 <div class="not-prose"></div>
@@ -265,10 +278,38 @@ Home                                    </span>
                     </div>
             </div>
                 
+                <div class="docmap hidden 2xl:block flex-none w-64 pl-8 mr-8">
+                    <div class="fixed bg-white dark:bg-black flex flex-col overflow-y-auto pt-10 px-8 pb-6" style="height:calc(100vh - 50px);">
+                        <div>
+                            <h5 class="text-slate-900 font-semibold mb-4 text-sm leading-6 dark:text-slate-100">
+                                On This Page
+                            </h5>
+                            <ul class="text-slate-700 text-sm leading-6">
+                                    <li class="group text-gray-800 hover:text-gray-900">
+                                        <span v-hash="'#create-table'" data-id="create-table" class="cursor-pointer font-medium block text-sm transform transition-colors duration-200 py-2">
+                                            Create Table
+                                        </span>
+                                    </li>
+                                    <li class="group text-gray-800 hover:text-gray-900">
+                                        <span v-hash="'#drop-table'" data-id="drop-table" class="cursor-pointer font-medium block text-sm transform transition-colors duration-200 py-2">
+                                            Drop Table
+                                        </span>
+                                    </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
                 
         </div>
     </div>    
 </div>
+
+<link rel="stylesheet" href="/codemirror/lib/codemirror.css">
+<link rel="stylesheet" href="/codemirror/theme/mocha.css" />
+<script src="/codemirror/lib/codemirror.js"></script>
+<script src="/codemirror/mode/javascript/javascript.js"></script>
+<script src="/codemirror/addon/edit/matchbrackets.js"></script>
+<script src="/codemirror/addon/selection/active-line.js"></script>
 
 <script>
 //doc instructions
@@ -283,14 +324,7 @@ import { ref } from "vue"
 import { mount } from "app.mjs"
 
 
-    const App = {
-        setup() {
-            function nav(url) {
-                window.open(url)
-            }
-            return { nav }
-        }
-    }
+        import App from "/pages/schema.mjs" 
     
 const Sidebar = {
     setup() {
@@ -307,7 +341,7 @@ mount('#sidebar', Sidebar)
 <script>hljs.highlightAll()</script>
 <script src="/lib/js/lite-yt-embed.js"></script>
 <script src="/mjs/docs.mjs" type="module"></script>
-
+    
 
     </main>
 </div>

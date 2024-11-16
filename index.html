@@ -32,7 +32,8 @@
         "app.mjs": "/mjs/app.mjs",
         "vue": "/lib/mjs/vue.min.mjs",
         "@servicestack/client": "/lib/mjs/servicestack-client.min.mjs",
-        "@servicestack/vue": "/lib/mjs/servicestack-vue.min.mjs"
+        "@servicestack/vue": "/lib/mjs/servicestack-vue.min.mjs",
+        "litdb": "/lib/mjs/litdb.min.js"
     }
 }
 </script>
@@ -219,7 +220,6 @@ mount('#header', Header)
 <p><code>litdb</code> is also available as a module, where it can be used directly in the browser:</p>
 <pre><code class="language-html">&lt;script type=&quot;module&quot;&gt;
 import { sqlite as $ } from &quot;https://unpkg.com/litdb/dist/index.min.js&quot;
-    
 const { sql, params } = $.from(Contact).select(c =&gt; $`${c.name}`).build()
 &lt;/script&gt;
 </code></pre>
@@ -244,6 +244,7 @@ are also available for the popular databases:</p>
                     </div>
                 </div>
             </div>
+<p>See <a href="/bun-sqlite">litdb Bun SQLite Docs</a></p>
 <h3 id="node-better-sqlite">Node better-sqlite<a class="header-anchor" href="javascript:;" onclick="location.hash='#node-better-sqlite'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
 <p>Use with Node <a href="https://github.com/WiseLibs/better-sqlite3">better-sqlite3</a>:</p>
 <div class="not-prose sh-copy cp flex cursor-pointer mb-3" onclick="copy(this)">
@@ -260,6 +261,7 @@ are also available for the popular databases:</p>
                     </div>
                 </div>
             </div>
+<p>See <a href="/better-sqlite">litdb better-sqlite3 Docs</a></p>
 <h3 id="postgresql">PostgreSQL<a class="header-anchor" href="javascript:;" onclick="location.hash='#postgresql'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
 <p>Use with the <a href="https://github.com/porsager/postgres">postgres.js</a> client:</p>
 <div class="not-prose sh-copy cp flex cursor-pointer mb-3" onclick="copy(this)">
@@ -276,6 +278,7 @@ are also available for the popular databases:</p>
                     </div>
                 </div>
             </div>
+<p>See <a href="/postgres">litdb postgres Docs</a></p>
 <h3 id="mysql">MySQL<a class="header-anchor" href="javascript:;" onclick="location.hash='#mysql'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
 <p>Use with the <a href="https://github.com/sidorares/node-mysql2">mysql2</a> client:</p>
 <div class="not-prose sh-copy cp flex cursor-pointer mb-3" onclick="copy(this)">
@@ -292,6 +295,7 @@ are also available for the popular databases:</p>
                     </div>
                 </div>
             </div>
+<p>See <a href="/mysql2">litdb mysql2 Docs</a></p>
 <h3 id="request-a-driver">Request a Driver<a class="header-anchor" href="javascript:;" onclick="location.hash='#request-a-driver'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
 <p>If you'd like to see a driver for a specific client, please open or vote for a feature request on litdb's
 <a href="https://github.com/litdb/litdb/discussions/categories/ideas">GitHub Discussions</a>.</p>
@@ -352,68 +356,8 @@ db.exec($.update(Contact).set({ email:jane.email }).where(hasId(jane.id))) // qu
 db.delete(jane)
 db.exec($.deleteFrom(Contact).where(hasId(jane.id))) // query builder
 </code></pre>
-<p>Same source is compatible with other sync drivers, just replace <code>@litdb/bun-sqlite</code> with <code>@litdb/better-sqlite</code> to use
-with <a href="https://github.com/litdb/better-sqlite">litdb/better-sqlite</a>.</p>
-<h2 id="async-driver-usage">Async Driver Usage<a class="header-anchor" href="javascript:;" onclick="location.hash='#async-driver-usage'" aria-label="Permalink">&ZeroWidthSpace;</a></h2>
-<p>The same APIs (returning promises) are available for async access to remote RDBMS's like PostgreSQL and MySQL.</p>
-<p>Example of using the <a href="https://github.com/porsager/postgres">postgres.js</a> driver:</p>
-<p><strong>db.ts</strong></p>
-<pre><code class="language-ts">import { connect } from &quot;@litdb/postgres&quot;
-
-export const connection = connect({ hostname, database, user, password })
-export const { $, async:db, native:sql } = connection
-</code></pre>
-<div class="tip custom-block">
-            <p class="custom-block-title">TIP</p><p>When needed use <code>sql</code> to access the native <a href="https://github.com/porsager/postgres#usage">postgres.js sql function</a></p>
-</div>
-<p><strong>app.ts</strong></p>
-<pre><code class="language-ts">import { $, db } from &quot;./db&quot;
-import { Contact } from &quot;./models&quot;
-
-await db.dropTable(Contact)
-await db.createTable(Contact)
-await db.insertAll([
-    new Contact({ name:&quot;John Doe&quot;, email:&quot;john@mail.org&quot; }),
-    new Contact({ name:&quot;Jane Doe&quot;, email:&quot;jane@mail.org&quot; }),
-])
-
-const janeEmail = 'jane@mail.org'
-const jane = await db.one&lt;Contact&gt;($.from(Contact).where(c =&gt; $`${c.email}=${janeEmail}`))
-
-// Insert examples
-const { lastInsertRowid:bobId } = await db.insert(
-    new Contact({ name:&quot;Bob&quot;, email:&quot;bob@mail.org&quot;}))
-
-const { lastInsertRowid } = await db.exec
-    `INSERT INTO Contact(name,email) VALUES('Jo','jo@doe.org')`
-
-const name = 'Alice', email = 'alice@mail.org'
-await db.exec`INSERT INTO Contact(name,email) VALUES (${name}, ${email})`
-
-// Typed SQL fragment with named param example
-const hasId = &lt;Table extends { id:number }&gt;(id:number|bigint) =&gt;
-    (x:Table) =&gt; $.sql($`${x.id} = $id`, { id })
-
-const contacts = await db.all($.from(Contact).into(Contact))                // =&gt; Contact[]
-const bob = await db.one($.from(Contact).where(hasId(bobId)).into(Contact)) // =&gt; Contact
-const contactsCount = await db.value($.from(Contact).rowCount())            // =&gt; number
-const emails = await db.column($.from(Contact).select(c =&gt; $`${c.email}`))  // =&gt; string[]
-const contactsArray = await db.arrays($.from(Contact))                      // =&gt; any[][]
-const bobArray = await db.array($.from(Contact).where(hasId(bobId)))        // =&gt; any[]
-
-// Update examples
-jane.email = 'jane@doe.org'
-await db.update(jane)                           // Update all properties
-await db.update(jane, { onlyProps:['email'] })  // Update only email
-// query builder
-await db.exec($.update(Contact).set({ email:jane.email }).where(hasId(jane.id)))
-
-// Delete examples
-await db.delete(jane)
-await db.exec($.deleteFrom(Contact).where(hasId(jane.id))) // query builder
-</code></pre>
-<p>Same source is compatible with other async drivers, just replace <code>@litdb/postgres</code> with <code>@litdb/mysql2</code> to use
-with <a href="https://github.com/litdb/mysql2">litdb/mysql2</a>.</p>
+<p>Same source is compatible with other sync drivers, e.g. can replace <code>@litdb/bun-sqlite</code> with <code>@litdb/better-sqlite</code> to use
+with <a href="/better-sqlite#usage">better-sqlite</a>. See also async usage docs for <a href="/postgres#usage">postgres</a> and <a href="/mysql2#usage">mysql2</a>.</p>
 
                 </div>
             </div>
@@ -456,80 +400,45 @@ or design-time type-checking and compile-time static analysis errors for those t
             </div>
         </div>
 
+        <link rel="stylesheet" href="/codemirror/lib/codemirror.css">
+<link rel="stylesheet" href="/codemirror/theme/mocha.css" />
+<script src="/codemirror/lib/codemirror.js"></script>
+<script src="/codemirror/mode/javascript/javascript.js"></script>
+<script src="/codemirror/addon/edit/matchbrackets.js"></script>
+<script src="/codemirror/addon/selection/active-line.js"></script>
+
+
         <div class="flex justify-center py-10">
             <div class="max-w-screen-lg">
                 <h1 class="text-6xl md:text-7xl lg:text-8xl font-bold tracking-tighter leading-tight md:leading-none mb-4 text-center">
                     <a id="composable" href="#composable">Composable</a>
                 </h1>
                 <div class="mt-8 flex justify-center">
-                    <div class="prose">
+                    <div id="composable-doc" class="prose">
                         
 <p>Queries are highly composable where external references can be used across multiple Query Builders and SQL fragments
 to easily create and compose multiple complex queries with shared references.</p>
 <p>SQL Builders and SQL fragments can be embedded inside other query builders utilizing the full expressiveness of SQL
 where their SQL and parameters are merged into the parent query.</p>
-<pre><code class="language-ts">// Use external aliased table references across multiple query builders
-const [ c, o ] = [ $.ref(Contact,'c'), $.ref(Order,'o') ]
-
-const now = new Date()
-const monthAgo = new Date(now.setDate(now.getDate()-30)).toISOString().split('T')[0]
-const last30Days = $.from(Order,'o2')
-    .where(o2 =&gt; $`${o2.contactId} = ${c.id}`)
-    .and(o2 =&gt; $`${o2.createdAt} &gt;= ${monthAgo}`)
-    .select(o2 =&gt; $`COUNT(${o2.id})`)
-
-const recentOrder = $.from(Order,'o3')
-    .where(o3 =&gt; $`${o3.contactId} = ${c.id}`)
-    .select(o3 =&gt; $`MAX(${o3.createdAt})`)
-
-// Example of SQL Fragment with parameter
-const startOfYear = `2024-01-01`
-const o4 = $.ref(Order,'o4')
-const totalOrders = $`SELECT SUM(${o4.total}) 
-     FROM ${o4} o4 
-    WHERE ${o4.contactId} = ${c.id} 
-      AND ${o4.createdAt} &gt;= ${startOfYear}`
-
-// Compose queries from multiple query builders and SQL fragments
-const q = $.from(c)
-    .join(o, { on:(c,o) =&gt; $`${c.id} = ${o.contactId}`})
-    .where`${o.createdAt} = (${recentOrder})`
-    .select`
-        ${c.id}, 
-        ${c.name}, 
-        ${o.createdAt} AS recentOrder, 
-        (${last30Days}) AS last30Days,
-        (${totalOrders}) AS totalOrders`
-    .orderBy`last30Days DESC`
-</code></pre>
-<p>Generated SQL</p>
-<pre><code class="language-sql">SELECT c.&quot;id&quot;, 
-       c.&quot;name&quot;, 
-       o.&quot;createdAt&quot; AS recentOrder, 
-       (SELECT COUNT(o2.&quot;id&quot;)
-          FROM &quot;Order&quot; o2
-         WHERE o2.&quot;contactId&quot; = c.&quot;id&quot;
-           AND o2.&quot;createdAt&quot; &gt;= $_1) AS last30Days,
-       (SELECT SUM(o4.&quot;total&quot;) 
-          FROM &quot;Order&quot; o4
-         WHERE o4.&quot;contactId&quot; = c.&quot;id&quot; 
-           AND o4.&quot;createdAt&quot; &gt;= $_2) AS totalOrders
- FROM &quot;Contact&quot; c
- JOIN &quot;Order&quot; o ON c.&quot;id&quot; = o.&quot;contactId&quot;
-WHERE o.&quot;createdAt&quot; = (SELECT MAX(o3.&quot;createdAt&quot;)
-        FROM &quot;Order&quot; o3
-        WHERE o3.&quot;contactId&quot; = c.&quot;id&quot;)
-ORDER BY last30Days DESC
-</code></pre>
-<p>PARAMS</p>
-<pre><code>_1: 2024-10-12
-_2: 2024-01-01
-</code></pre>
+<p><live-preview src="/mjs/composable.mjs"></live-preview></p>
 
                     </div>
                 </div>
             </div>
         </div>
+        <script type="module">
+            import { ref } from "vue"
+            import { mount } from "app.mjs"
+            const App = {
+                setup(app) {
+                    function nav(url) {
+                        window.open(url)
+                    }
+                    return { nav }
+                }
+            }
+            mount('#composable-doc', App)
+        </script>
 
     </main>
 </div>
