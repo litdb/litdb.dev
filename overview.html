@@ -235,7 +235,61 @@ Home                                    </span>
 It is designed to leverage TypeScript's powerful type system to provide a simple and intuitive type-safe wrapper around
 constructing and executing typed SQL queries with a focus on type safety, best practices and portability.</p>
 <h3 id="litdb-library">litdb library<a class="header-anchor" href="javascript:;" onclick="location.hash='#litdb-library'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
-<p>The core <code>litdb</code> library provides a set of composable query builders and SQL fragments that can be used to construct</p>
+<p>The core <code>litdb</code> library provides a set of composable query builders and SQL fragments that can be used to generate
+SQL that can be executed on SQLite, MySQL and PostgreSQL.</p>
+<h3 id="litdb-drivers">litdb drivers<a class="header-anchor" href="javascript:;" onclick="location.hash='#litdb-drivers'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
+<p>The litdb Drivers provide a unified interface for executing custom parameterized SQL, SQL Builders and SQL Fragments
+for their respective driver implementation. The SQLite drivers support both the Sync and Async DbConnection whilst
+remote databases like PostgreSQL and MySQL only support the Async DbConnection.</p>
+<pre><code class="language-ts">interface SyncDbConnection {
+    driver:Driver
+    $:Function
+    schema:Schema
+    quote(symbol:string): string
+    insert&lt;T extends ClassInstance&gt;(row:T, options?:InsertOptions): Changes
+    insertAll&lt;T extends ClassInstance&gt;(rows:T[], options?:InsertOptions): Changes
+    update&lt;T extends ClassInstance&gt;(row:T, options?:UpdateOptions): Changes
+    delete&lt;T extends ClassInstance&gt;(row:T, options?:DeleteOptions): Changes
+    listTables(): string[]
+    dropTable&lt;Table extends ClassParam&gt;(table:Table): void
+    createTable&lt;Table extends ClassParam&gt;(table:Table): void
+    all&lt;RetType&gt;(strings: TemplateStringsArray | SqlBuilder | Fragment | IntoFragment&lt;RetType&gt;, ...params: any[]): RetType[]
+    one&lt;RetType&gt;(strings: TemplateStringsArray | SqlBuilder | Fragment | IntoFragment&lt;RetType&gt;, ...params: any[]): RetType
+    column&lt;ReturnValue&gt;(strings: TemplateStringsArray | SqlBuilder | Fragment, ...params: any[]): RetType[]
+    value&lt;ReturnValue&gt;(strings: TemplateStringsArray | SqlBuilder | Fragment, ...params: any[]): ReturnValue
+    arrays(strings: TemplateStringsArray | SqlBuilder | Fragment, ...params: any[]): any[][]
+    array(strings: TemplateStringsArray | SqlBuilder | Fragment, ...params: any[]): any[]
+    exec(strings:TemplateStringsArray | SqlBuilder | Fragment, ...params:any[]): Changes
+    run(strings:TemplateStringsArray | SqlBuilder | Fragment, ...params:any[]): void
+    prepareSync&lt;T&gt;(str: TemplateStringsArray | SqlBuilder | Fragment, ...params: any[]): Statement    
+    close()
+}
+</code></pre>
+<h2 id="data-models">Data Models<a class="header-anchor" href="javascript:;" onclick="location.hash='#data-models'" aria-label="Permalink">&ZeroWidthSpace;</a></h2>
+<p>litdb is more a lightweight data mapper than a full-fledged ORM, but many of its APIs are designed to work with
+<a href="/models">data models</a> which are simple TypeScript classes that represent and map 1:1 to tables in a database.</p>
+<h2 id="safe-by-default">Safe by default<a class="header-anchor" href="javascript:;" onclick="location.hash='#safe-by-default'" aria-label="Permalink">&ZeroWidthSpace;</a></h2>
+<p>All SQL Queries and SQL Fragments require using a tagged template function to prevent SQL Injection attacks, e.g:</p>
+<live-preview>
+const bobbyTables = "Robert'); DROP TABLE Students;--"
+db.one(`SELECT * FROM Contact WHERE name = ${bobbyTables}`)
+</live-preview>
+<p>Driver APIs, SQL Builders and Expressions instead accept templated strings which auto parameterizes SQL queries:</p>
+<live-preview>
+const bobbyTables = "Robert'); DROP TABLE Students;--"
+db.one`SELECT * FROM Contact WHERE name = ${bobbyTables}`
+db.one($`SELECT * FROM Contact WHERE name = ${bobbyTables}`)
+db.one($.from(Contact).where`name = ${bobbyTables}`)
+db.one($.sql(`SELECT * FROM Contact WHERE name = $bobbyTables`, { bobbyTables }))
+</live-preview>
+<h2 id="portable">Portable<a class="header-anchor" href="javascript:;" onclick="location.hash='#portable'" aria-label="Permalink">&ZeroWidthSpace;</a></h2>
+<p>litdb is designed to be portable where in most cases query builders, expressions and driver APIs that stick to ANSI SQL
+syntax can be used across different databases and drivers. This preserves investments and knowledge reuse allowing
+your App's logic to bind to RDBMS-agnostic abstractions that can be reused across different databases or allow your
+App to easily migrate to run on different databases.</p>
+<h2 id="expressive">Expressive<a class="header-anchor" href="javascript:;" onclick="location.hash='#expressive'" aria-label="Permalink">&ZeroWidthSpace;</a></h2>
+<p>At the same time litdb SQL Builders and Fragments doesn't restrict you to a subset of SQL, you can use the full
+expressiveness of your RDBMS SQL to make use of RDBMS-specific features when needed.</p>
 
                 </div>
 
@@ -290,7 +344,33 @@ constructing and executing typed SQL queries with a focus on type safety, best p
                                                             litdb library
                                                         </span>
                                                     </li>
+                                                    <li data-id="litdb-drivers" class="text-gray-500 hover:text-gray-900">
+                                                        <span v-hash="'#litdb-drivers'" class="cursor-pointer flex text-sm transform transition-colors duration-200 py-2">
+                                                            <svg width="3" height="24" viewBox="0 -9 3 24" class="mr-2 overflow-visible"><path d="M0 0L3 3L0 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path></svg>
+                                                            litdb drivers
+                                                        </span>
+                                                    </li>
                                             </ul>
+                                    </li>
+                                    <li class="group text-gray-800 hover:text-gray-900">
+                                        <span v-hash="'#data-models'" data-id="data-models" class="cursor-pointer font-medium block text-sm transform transition-colors duration-200 py-2">
+                                            Data Models
+                                        </span>
+                                    </li>
+                                    <li class="group text-gray-800 hover:text-gray-900">
+                                        <span v-hash="'#safe-by-default'" data-id="safe-by-default" class="cursor-pointer font-medium block text-sm transform transition-colors duration-200 py-2">
+                                            Safe by default
+                                        </span>
+                                    </li>
+                                    <li class="group text-gray-800 hover:text-gray-900">
+                                        <span v-hash="'#portable'" data-id="portable" class="cursor-pointer font-medium block text-sm transform transition-colors duration-200 py-2">
+                                            Portable
+                                        </span>
+                                    </li>
+                                    <li class="group text-gray-800 hover:text-gray-900">
+                                        <span v-hash="'#expressive'" data-id="expressive" class="cursor-pointer font-medium block text-sm transform transition-colors duration-200 py-2">
+                                            Expressive
+                                        </span>
                                     </li>
                             </ul>
                         </div>
@@ -300,6 +380,13 @@ constructing and executing typed SQL queries with a focus on type safety, best p
         </div>
     </div>    
 </div>
+
+<link rel="stylesheet" href="/codemirror/lib/codemirror.css">
+<link rel="stylesheet" href="/codemirror/theme/mocha.css" />
+<script src="/codemirror/lib/codemirror.js"></script>
+<script src="/codemirror/mode/javascript/javascript.js"></script>
+<script src="/codemirror/addon/edit/matchbrackets.js"></script>
+<script src="/codemirror/addon/selection/active-line.js"></script>
 
 
 <script>

@@ -230,7 +230,24 @@ Home                                    </span>
                 <div class="not-prose"></div>
 
                 <div class="content">
-                    
+                    <h2 id="simple-queries">Simple Queries<a class="header-anchor" href="javascript:;" onclick="location.hash='#simple-queries'" aria-label="Permalink">&ZeroWidthSpace;</a></h2>
+<p>Simple queries can be executed directly on the litdb driver APIs, the different APIs available based on whether the
+query is expected to return multiple rows, a single row, a single value, a single column, etc.</p>
+<live-preview>
+const id = 1
+db.all`SELECT * FROM Contact`                     // => Contact[]
+db.one`SELECT * FROM Contact WHERE id = ${id}`    // => Contact
+db.value`SELECT COUNT(*) FROM Contact`            // => number
+db.column`SELECT firstName FROM Contact`          // => string[]
+db.arrays`SELECT * FROM Contact`                  // => any[][]
+db.array`SELECT * FROM Contact WHERE id = ${id}`  // => any[]
+</live-preview>
+<h2 id="select-query-builder">SELECT Query Builder<a class="header-anchor" href="javascript:;" onclick="location.hash='#select-query-builder'" aria-label="Permalink">&ZeroWidthSpace;</a></h2>
+<p><code>$.from(Table)</code> is used to create a SELECT query builder which by default selects all known columns of the data model.</p>
+<live-preview>
+$.from(Contact)
+</live-preview>
+
                 </div>
 
                 <div class="not-prose"></div>
@@ -266,10 +283,38 @@ Home                                    </span>
                     </div>
             </div>
                 
+                <div class="docmap hidden 2xl:block flex-none w-64 pl-8 mr-8">
+                    <div class="fixed bg-white dark:bg-black flex flex-col overflow-y-auto pt-10 px-8 pb-6" style="height:calc(100vh - 50px);">
+                        <div>
+                            <h5 class="text-slate-900 font-semibold mb-4 text-sm leading-6 dark:text-slate-100">
+                                On This Page
+                            </h5>
+                            <ul class="text-slate-700 text-sm leading-6">
+                                    <li class="group text-gray-800 hover:text-gray-900">
+                                        <span v-hash="'#simple-queries'" data-id="simple-queries" class="cursor-pointer font-medium block text-sm transform transition-colors duration-200 py-2">
+                                            Simple Queries
+                                        </span>
+                                    </li>
+                                    <li class="group text-gray-800 hover:text-gray-900">
+                                        <span v-hash="'#select-query-builder'" data-id="select-query-builder" class="cursor-pointer font-medium block text-sm transform transition-colors duration-200 py-2">
+                                            SELECT Query Builder
+                                        </span>
+                                    </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
                 
         </div>
     </div>    
 </div>
+
+<link rel="stylesheet" href="/codemirror/lib/codemirror.css">
+<link rel="stylesheet" href="/codemirror/theme/mocha.css" />
+<script src="/codemirror/lib/codemirror.js"></script>
+<script src="/codemirror/mode/javascript/javascript.js"></script>
+<script src="/codemirror/addon/edit/matchbrackets.js"></script>
+<script src="/codemirror/addon/selection/active-line.js"></script>
 
 
 <script>
