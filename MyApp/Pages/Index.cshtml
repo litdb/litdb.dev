@@ -38,6 +38,7 @@
         ["vue"]                  = ("/lib/mjs/vue.mjs",                 "/lib/mjs/vue.min.mjs"),
         ["@servicestack/client"] = ("/lib/mjs/servicestack-client.mjs", "/lib/mjs/servicestack-client.min.mjs"),
         ["@servicestack/vue"]    = ("/lib/mjs/servicestack-vue.mjs",    "/lib/mjs/servicestack-vue.min.mjs"),
+        ["litdb"]                = ("/lib/mjs/litdb.js",                "/lib/mjs/litdb.min.js"),
     })
 </head>
 <body class="bg-white dark:bg-black dark:text-white">
@@ -160,18 +161,33 @@
             </div>
         </div>
 
+        @await Html.PartialAsync("CodeMirrorIncludes")
+
         <div class="flex justify-center py-10">
             <div class="max-w-screen-lg">
                 <h1 class="text-6xl md:text-7xl lg:text-8xl font-bold tracking-tighter leading-tight md:leading-none mb-4 text-center">
                     <a id="composable" href="#composable">Composable</a>
                 </h1>
                 <div class="mt-8 flex justify-center">
-                    <div class="prose">
+                    <div id="composable-doc" class="prose">
                         @await Html.PartialAsync("IncludeMarkdown", "home/composable.md")
                     </div>
                 </div>
             </div>
         </div>
+        <script type="module">
+            import { ref } from "vue"
+            import { mount } from "app.mjs"
+            const App = {
+                setup(app) {
+                    function nav(url) {
+                        window.open(url)
+                    }
+                    return { nav }
+                }
+            }
+            mount('#composable-doc', App)
+        </script>
 
     </main>
 </div>

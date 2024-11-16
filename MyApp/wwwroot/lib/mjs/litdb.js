@@ -1,9 +1,41 @@
 // src/utils.ts
-function isDate(d) {
-  return d && Object.prototype.toString.call(d) === "[object Date]" && !isNaN(d);
+class IS {
+  static arr(o) {
+    return Array.isArray(o);
+  }
+  static rec(o) {
+    return typeof o == "object";
+  }
+  static obj(o) {
+    return typeof o == "object";
+  }
+  static fn(o) {
+    return typeof o == "function";
+  }
+  static str(o) {
+    return typeof o == "string";
+  }
+  static num(o) {
+    return typeof o == "number";
+  }
+  static sym(o) {
+    return typeof o == "symbol";
+  }
+  static tpl(o) {
+    return IS.arr(o) && "raw" in o;
+  }
+  static date(o) {
+    return o && Object.prototype.toString.call(o) === "[object Date]" && !isNaN(o);
+  }
 }
 function toDate(s) {
-  return !s ? null : isDate(s) ? s : s[0] == "/" ? new Date(parseFloat(/Date\(([^)]+)\)/.exec(s)[1])) : new Date(s);
+  return !s ? null : IS.date(s) ? s : s[0] == "/" ? new Date(parseFloat(/Date\(([^)]+)\)/.exec(s)[1])) : new Date(s);
+}
+function pad(n) {
+  return n < 10 ? "0" + n : n;
+}
+function dateISOString(d = new Date) {
+  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}`;
 }
 function propsWithValues(obj) {
   return Object.keys(obj).filter((k) => obj[k] != null);
@@ -57,27 +89,48 @@ function nextParamVal(params) {
   const positional = Object.keys(params).map((x) => x[0] === "_" ? parseInt(x.substring(1)) : NaN).filter((x) => !isNaN(x));
   return positional.length == 0 ? 1 : Math.max(...positional) + 1;
 }
+function sortParamKeys(keys) {
+  return keys.sort((a, b) => {
+    const aM = a.match(/^_(\d+)/);
+    const bM = b.match(/^_(\d+)/);
+    if (aM && bM)
+      return parseInt(aM[1]) - parseInt(bM[1]);
+    if (aM)
+      return -1;
+    if (bM)
+      return 1;
+    return a.localeCompare(b);
+  });
+}
+function sortParams(o) {
+  return sortParamKeys(Object.keys(o)).reduce((acc, k) => {
+    acc[k] = o[k];
+    return acc;
+  }, {});
+}
 function mergeParams(params, f) {
   let sql = f.sql;
-  const hasConflicts = Object.keys(f.params).some((x) => (x in params));
-  if (!hasConflicts) {
+  const conflicts = Object.keys(f.params).some((x) => (x in params));
+  if (!conflicts) {
     for (const [key, value] of Object.entries(f.params)) {
       params[key] = value;
     }
     return sql;
   }
   const startIndex = nextParamVal(params);
-  const newMapping = {};
+  const newMap = {};
   let i = 0;
-  for (const [key, _] of Object.entries(f.params)) {
-    newMapping[key] = "_" + (startIndex + i++);
+  for (const key of Object.keys(f.params)) {
+    newMap[key] = "_" + (startIndex + i++);
   }
-  for (const [key, value] of Object.entries(f.params).reverse()) {
-    const nextValue = newMapping[key];
-    sql = sql.replaceAll(`\$${key}`, `\$${nextValue}`);
-    params[nextValue] = value;
-  }
-  return sql;
+  const toSql = sql.replace(/\$(\w+)/g, (_, name) => {
+    const toVal = newMap[name];
+    if (toVal) {
+      params[toVal] = f.params[name];
+    }
+    return `\$${toVal ?? name}`;
+  });
+  return toSql;
 }
 function asType(cls) {
   if (!IS.obj(cls) && !IS.fn(cls))
@@ -87,33 +140,6 @@ function asType(cls) {
 }
 function asRef(cls) {
   return IS.obj(cls) && cls.$ref ? cls : undefined;
-}
-
-class IS {
-  static arr(o) {
-    return Array.isArray(o);
-  }
-  static rec(o) {
-    return typeof o == "object";
-  }
-  static obj(o) {
-    return typeof o == "object";
-  }
-  static fn(o) {
-    return typeof o == "function";
-  }
-  static str(o) {
-    return typeof o == "string";
-  }
-  static num(o) {
-    return typeof o == "number";
-  }
-  static sym(o) {
-    return typeof o == "symbol";
-  }
-  static tpl(o) {
-    return IS.arr(o) && "raw" in o;
-  }
 }
 function snakeCase(s) {
   return (s || "").replace(/([a-z])([A-Z])/g, "$1_$2").toLowerCase();
@@ -201,14 +227,13 @@ class Meta {
 // src/converters.ts
 function converterFor(converter, ...dataTypes) {
   const to = {};
-  for (const dataType of dataTypes) {
-    to[dataType] = converter;
+  for (const type2 of dataTypes) {
+    to[type2] = converter;
   }
   return to;
 }
 
 class DateTimeConverter {
-  static instance = new DateTimeConverter;
   toDb(value) {
     const d = toDate(value);
     return d ? d.toISOString() : null;
@@ -220,8 +245,76 @@ class DateTimeConverter {
   }
 }
 
+// src/model.ts
+function table(opt) {
+  return function(target) {
+    const table2 = Object.assign({}, opt, { name: opt?.alias ?? target.name });
+    if (!target.$id)
+      target.$id = Symbol(target.name);
+    target.$type ??= { name: target.name };
+    target.$type.table = table2;
+  };
+}
+function column(type2, opt) {
+  return function(target, propKey) {
+    const col = Object.assign({}, opt, { type: type2, name: opt?.alias ?? propKey });
+    if (propKey === "id" || opt?.autoIncrement)
+      col.primaryKey = true;
+    if (!target.constructor.$id)
+      target.constructor.$id = Symbol(target.constructor.name);
+    const props = target.constructor.$props ?? (target.constructor.$props = []);
+    let p = props.find((x) => x.name === propKey);
+    if (!p) {
+      p = { name: propKey };
+      props.push(p);
+    }
+    p.column = col;
+    if (IS.sym(p.column.type)) {
+      p.column.type = p.column.type.description;
+    }
+  };
+}
+function Table(cls, def) {
+  if (!def)
+    throw new Error("Table definition is required");
+  const M = cls;
+  if (!M.$id)
+    M.$id = Symbol(cls.name);
+  M.$type ??= { name: cls.name };
+  M.$type.table = def.table ?? {};
+  M.$type.table.name ??= cls.name;
+  const props = M.$props ?? (M.$props = []);
+  Object.keys(def.columns ?? {}).forEach((name) => {
+    const col = def.columns[name];
+    if (!col)
+      throw new Error(`Column definition for ${name} is missing`);
+    if (!col.type)
+      throw new Error(`Column type for ${name} is missing`);
+    if (name === "id" || col?.autoIncrement)
+      col.primaryKey = true;
+    let p = props.find((x) => x.name === name);
+    if (!p) {
+      p = { name };
+      props.push(p);
+    }
+    p.column = col;
+    p.column.name ??= col.alias ?? name;
+    if (IS.sym(p.column.type)) {
+      p.column.type = p.column.type.description;
+    }
+  });
+  return cls;
+}
+var DefaultValues = {
+  NOW: "{NOW}",
+  MAX_TEXT: "{MAX_TEXT}",
+  MAX_TEXT_UNICODE: "{MAX_TEXT_UNICODE}",
+  TRUE: "{TRUE}",
+  FALSE: "{FALSE}"
+};
+
 // src/schema.ts
-var DriverRequired = `Missing Driver Implementation, see: https://github.com/litdb/litdb`;
+var DriverRequired = `Missing Driver Implementation, see: https://litdb.dev/#litdb-drivers`;
 var DriverRequiredProxy = new Proxy({}, {
   get: (target, key) => {
     throw new Error(DriverRequired);
@@ -236,126 +329,190 @@ function assertSql(sql) {
 }
 
 class Schema {
-  dialect;
-  constructor(dialect) {
-    this.dialect = dialect;
-  }
-  converters = {
-    ...converterFor(DateTimeConverter.instance, "DATE", "DATETIME", "TIMESTAMP", "TIMESTAMPZ")
+  driver;
+  $;
+  types;
+  variables = {
+    [DefaultValues.NOW]: "CURRENT_TIMESTAMP",
+    [DefaultValues.MAX_TEXT]: "TEXT",
+    [DefaultValues.MAX_TEXT_UNICODE]: "TEXT",
+    [DefaultValues.TRUE]: "1",
+    [DefaultValues.FALSE]: "0"
   };
-  sqlTableNames(schema) {
-    throw new Error(DriverRequired);
+  converters = {
+    ...converterFor(new DateTimeConverter, "DATE", "DATETIME", "TIMESTAMP", "TIMESTAMPZ")
+  };
+  constructor(driver, $, types) {
+    this.driver = driver;
+    this.$ = $;
+    this.types = types;
   }
-  sqlColumnDefinition(column) {
-    throw new Error(DriverRequired);
+  get dialect() {
+    return this.driver.dialect;
   }
-  sqlForeignKeyDefinition(table, column) {
-    throw new Error(DriverRequired);
+  quoteTable(name) {
+    return this.dialect.quoteTable(name);
   }
-  sqlIndexDefinition(table, column) {
-    throw new Error(DriverRequired);
+  quoteColumn(name) {
+    return this.dialect.quoteColumn(name);
   }
-  dropTable(table) {
-    const meta = Meta.assert(table);
-    let sql = `DROP TABLE IF EXISTS ${this.dialect.quoteTable(meta.tableName)}`;
+  sqlTableNames() {
+    return "SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_TYPE='BASE TABLE'";
+  }
+  sqlRowCount(sql) {
+    return `SELECT COUNT(*) FROM (${sql}) AS COUNT`;
+  }
+  sqlIndexDefinition(table2, col) {
+    const unique = col.unique ? "UNIQUE INDEX" : "INDEX";
+    const name = `idx_${table2.name}_${col.name}`.toLowerCase();
+    return `CREATE ${unique} ${name} ON ${this.quoteTable(table2.name)} (${this.quoteColumn(col.name)})`;
+  }
+  sqlForeignKeyDefinition(table2, col) {
+    const ref = col.references;
+    if (!ref)
+      return "";
+    const $ = this.$;
+    const refMeta = Array.isArray(ref.table) ? Meta.assert(ref.table[0]) : Meta.assert(ref.table);
+    const refKeys = Array.isArray(ref.table) ? Array.isArray(ref.table[1]) ? ref.table[1].map((x) => $.quoteColumn(x)).join(",") : $.quoteColumn(ref.table[1]) : refMeta.columns.filter((x) => x.primaryKey).map((x) => $.quoteColumn(x.name)).join(",");
+    let sql = `FOREIGN KEY (${$.quoteColumn(col.name)}) REFERENCES ${$.quoteTable(refMeta.tableName)}${refKeys ? "(" + refKeys + ")" : ""}`;
+    if (ref.on) {
+      sql += ` ON ${ref.on[0]} ${ref.on[1]}`;
+    }
     return sql;
   }
-  createTable(table) {
-    const meta = Meta.assert(table);
-    const columns = meta.columns;
-    let sqlColumns = columns.map((c) => this.sqlColumnDefinition(c));
-    const foreignKeys = columns.filter((c) => c.references).map((c) => this.sqlForeignKeyDefinition(meta.table, c));
+  dataType(col) {
+    let dt = col.type;
+    let type2 = this.types.native.includes(dt) ? dt : undefined;
+    if (!type2) {
+      for (const [dbType, typeMap] of Object.entries(this.types.map)) {
+        if (typeMap.includes(dt)) {
+          type2 = dbType;
+          break;
+        }
+      }
+    }
+    return !type2 ? dt : type2;
+  }
+  defaultValue(col) {
+    return col.defaultValue ? " DEFAULT " + (this.variables[col.defaultValue] ?? col.defaultValue) : "";
+  }
+  sqlColumnDefinition(col) {
+    let type2 = this.dataType(col);
+    let sb = `${this.quoteColumn(col.name)} ${type2}`;
+    if (col.primaryKey) {
+      sb += " PRIMARY KEY";
+    }
+    if (col.autoIncrement) {
+      sb += " AUTOINCREMENT";
+    }
+    if (col.required) {
+      sb += " NOT NULL";
+    }
+    if (col.unique && !col.index) {
+      sb += " UNIQUE";
+    }
+    sb += this.defaultValue(col);
+    return sb;
+  }
+  dropTable(table2) {
+    let sql = `DROP TABLE IF EXISTS ${this.quoteTable(Meta.assert(table2).tableName)}`;
+    return sql;
+  }
+  createTable(table2) {
+    const M = Meta.assert(table2);
+    const cols = M.columns;
+    let sqlCols = cols.map((c) => this.sqlColumnDefinition(c));
+    const foreignKeys = cols.filter((c) => c.references).map((c) => this.sqlForeignKeyDefinition(M.table, c));
     const definitions = [
-      sqlColumns,
+      sqlCols,
       foreignKeys
     ].filter((x) => x.length).map((x) => x.join(",\n  ")).join(",\n  ");
-    let sql = `CREATE TABLE ${this.dialect.quoteTable(meta.tableName)} (\n  ${definitions}\n);\n`;
-    const indexes = columns.filter((c) => c.index).map((c) => `${this.sqlIndexDefinition(meta.table, c)};`);
+    let sql = `CREATE TABLE ${this.quoteTable(M.tableName)} (\n  ${definitions}\n);\n`;
+    const indexes = cols.filter((c) => c.index).map((c) => `${this.sqlIndexDefinition(M.table, c)};`);
     if (indexes.length > 0) {
       sql += indexes.join("\n");
     }
     return sql;
   }
-  insert(table, options) {
-    const meta = Meta.assert(table);
-    let props = meta.props.filter((x) => x.column);
+  insert(table2, options) {
+    const M = Meta.assert(table2);
+    let props = M.props.filter((x) => x.column);
     if (options?.onlyProps) {
       props = props.filter((c) => options.onlyProps.includes(c.name));
     }
-    let columns = props.map((x) => x.column).filter((c) => !c.autoIncrement);
-    let sqlColumns = columns.map((c) => `${this.dialect.quoteColumn(c.name)}`).join(", ");
-    let sqlParams = columns.map((c) => `\$${c.name}`).join(", ");
-    let sql = `INSERT INTO ${this.dialect.quoteTable(meta.tableName)} (${sqlColumns}) VALUES (${sqlParams})`;
+    let cols = props.map((x) => x.column).filter((c) => !c.autoIncrement && !c.defaultValue);
+    let sqlCols = cols.map((c) => `${this.quoteColumn(c.name)}`).join(", ");
+    let sqlParams = cols.map((c) => `\$${c.name}`).join(", ");
+    let sql = `INSERT INTO ${this.quoteTable(M.tableName)} (${sqlCols}) VALUES (${sqlParams})`;
     return sql;
   }
-  update(table, options) {
-    const meta = Meta.assert(table);
-    let props = options?.onlyProps ? meta.props.filter((c) => options.onlyProps.includes(c.name) || c.column?.primaryKey) : meta.props.filter((x) => x.column);
-    const primaryKeys = props.filter((c) => c.column?.primaryKey);
-    if (!primaryKeys.length)
-      throw new Error(`${meta.name} does not have a PRIMARY KEY`);
-    const columns = props.map((x) => x.column);
-    const setColumns = columns.filter((c) => !c.primaryKey);
-    const whereColumns = columns.filter((c) => c.primaryKey);
-    const setSql = setColumns.map((c) => `${this.dialect.quoteColumn(c.name)}=\$${c.name}`).join(", ");
-    const whereSql = whereColumns.map((c) => `${this.dialect.quoteColumn(c.name)} = \$${c.name}`).join(" AND ");
-    let sql = `UPDATE ${this.dialect.quoteTable(meta.tableName)} SET ${setSql}`;
+  update(table2, options) {
+    const M = Meta.assert(table2);
+    let props = options?.onlyProps ? M.props.filter((c) => options.onlyProps.includes(c.name) || c.column?.primaryKey) : M.props.filter((x) => x.column);
+    if (!props.filter((c) => c.column?.primaryKey).length)
+      throw new Error(`${M.name} does not have a PRIMARY KEY`);
+    const cols = props.map((x) => x.column);
+    const setCols = cols.filter((c) => !c.primaryKey);
+    const whereCols = cols.filter((c) => c.primaryKey);
+    const setSql = setCols.map((c) => `${this.quoteColumn(c.name)}=\$${c.name}`).join(", ");
+    const whereSql = whereCols.map((c) => `${this.quoteColumn(c.name)} = \$${c.name}`).join(" AND ");
+    let sql = `UPDATE ${this.quoteTable(M.tableName)} SET ${setSql}`;
     if (whereSql) {
       sql += ` WHERE ${whereSql}`;
     } else {
-      throw new Error(`No WHERE clause exists for UPDATE ${meta.tableName}`);
+      throw new Error(`No WHERE clause exists for UPDATE ${M.tableName}`);
     }
     return sql;
   }
-  delete(table, options) {
-    const meta = Meta.assert(table);
-    let props = meta.props.filter((x) => x.column);
-    const columns = props.map((x) => x.column);
-    const whereColumns = columns.filter((c) => c.primaryKey);
-    let whereSql = whereColumns.map((c) => `${this.dialect.quoteColumn(c.name)} = \$${c.name}`).join(" AND ");
+  delete(table2, options) {
+    const M = Meta.assert(table2);
+    let props = M.props.filter((x) => x.column);
+    const cols = props.map((x) => x.column);
+    const whereCols = cols.filter((c) => c.primaryKey);
+    let whereSql = whereCols.map((c) => `${this.quoteColumn(c.name)} = \$${c.name}`).join(" AND ");
     if (options?.where) {
       let sql2 = whereSql ? " AND " : " WHERE ";
       const where = IS.arr(options.where) ? options.where : [options.where];
       whereSql += sql2 + where.join(" AND ");
     }
-    let sql = `DELETE FROM ${this.dialect.quoteTable(meta.tableName)}`;
+    let sql = `DELETE FROM ${this.quoteTable(M.tableName)}`;
     if (whereSql) {
       sql += ` WHERE ${whereSql}`;
     } else {
-      throw new Error(`No WHERE clause exists for DELETE ${meta.tableName}`);
+      throw new Error(`No WHERE clause exists for DELETE ${M.tableName}`);
     }
     return sql;
   }
-  toDbBindings(table) {
+  toDbBindings(table2) {
     const values = [];
-    const meta = Meta.assert(table.constructor);
-    const props = meta.props.filter((x) => x.column);
+    const M = Meta.assert(table2.constructor);
+    const props = M.props.filter((x) => x.column);
     props.forEach((x) => {
-      const value = table[x.column.name];
-      const converter = this.converters[x.column.type];
-      if (converter) {
-        const dbValue = converter.toDb(value);
-        values.push(dbValue);
+      const val = table2[x.column.name];
+      const conv = this.converters[x.column.type];
+      if (conv) {
+        const dbVal = conv.toDb(val);
+        values.push(dbVal);
       } else {
-        values.push(value);
+        values.push(val);
       }
     });
     return values;
   }
-  toDbObject(table, options) {
+  toDbObject(table2, options) {
     const values = {};
-    const meta = Meta.assert(table.constructor);
-    const props = meta.props.filter((x) => x.column);
+    const M = Meta.assert(table2.constructor);
+    const props = M.props.filter((x) => x.column);
     for (const x of props) {
       if (options?.onlyProps && !options.onlyProps.includes(x.name))
         continue;
-      const value = table[x.name];
-      const converter = this.converters[x.column.type];
-      if (converter) {
-        const dbValue = converter.toDb(value);
-        values[x.column.name] = dbValue;
+      const val = table2[x.name];
+      const conv = this.converters[x.column.type];
+      if (conv) {
+        const dbVal = conv.toDb(val);
+        values[x.column.name] = dbVal;
       } else {
-        values[x.column.name] = value;
+        values[x.column.name] = val;
       }
     }
     return values;
@@ -389,14 +546,20 @@ class DbConnection {
   insertAll(rows, options) {
     return Promise.resolve(this.sync.insertAll(rows, options));
   }
+  update(row, options) {
+    return Promise.resolve(this.sync.update(row, options));
+  }
+  delete(row, options) {
+    return Promise.resolve(this.sync.delete(row, options));
+  }
   listTables() {
     return Promise.resolve(this.sync.listTables());
   }
-  dropTable(table) {
-    return Promise.resolve(this.sync.dropTable(table));
+  dropTable(table2) {
+    return Promise.resolve(this.sync.dropTable(table2));
   }
-  createTable(table) {
-    return Promise.resolve(this.sync.createTable(table));
+  createTable(table2) {
+    return Promise.resolve(this.sync.createTable(table2));
   }
   all(strings, ...params) {
     return Promise.resolve(this.sync.all(strings, ...params));
@@ -422,21 +585,26 @@ class DbConnection {
   run(strings, ...params) {
     return Promise.resolve(this.sync.run(strings, ...params));
   }
-  prepare(strings, ...params) {
-    if (IS.tpl(strings)) {
-      let stmt = this.connection.prepare(strings, ...params);
-      return [stmt, params];
-    } else if (IS.str(strings)) {
-      if ("build" in strings) {
-        let query = strings.build();
+  prepare(str, ...params) {
+    if (IS.tpl(str)) {
+      let stmt = this.connection.prepare(str, ...params);
+      return [stmt, params, undefined];
+    } else if (IS.obj(str)) {
+      if ("build" in str) {
+        let query = str.build();
         let stmt = this.connection.prepare(query.sql);
-        return [stmt, query.params];
-      } else if ("sql" in strings) {
-        let stmt = this.connection.prepare(strings.sql);
-        return [stmt, strings.params ?? {}];
+        return [stmt, query.params ?? {}, query.into];
+      } else if ("sql" in str) {
+        let sql = str.sql;
+        let params2 = str.params ?? {};
+        let stmt = this.connection.prepare(sql);
+        return [stmt, params2, str.into];
       }
     }
-    throw new Error(`Invalid argument: ${toStr(strings)}`);
+    throw new Error(`Invalid argument: ${toStr(str)}`);
+  }
+  close() {
+    return this.connection.close();
   }
 }
 
@@ -527,13 +695,13 @@ class SyncDbConnection {
   listTables() {
     return this.column({ sql: this.schema.sqlTableNames(), params: {} });
   }
-  dropTable(table) {
-    let stmt = this.connection.prepareSync(this.schema.dropTable(table));
-    return stmt.execSync();
+  dropTable(table2) {
+    let stmt = this.connection.prepareSync(this.schema.dropTable(table2));
+    stmt.runSync();
   }
-  createTable(table) {
-    let stmt = this.connection.prepareSync(this.schema.createTable(table));
-    return stmt.execSync();
+  createTable(table2) {
+    let stmt = this.connection.prepareSync(this.schema.createTable(table2));
+    stmt.runSync();
   }
   prepareSync(str, ...params) {
     if (IS.tpl(str)) {
@@ -605,6 +773,9 @@ class SyncDbConnection {
       stmt.runSync(p);
     }
   }
+  close() {
+    this.connection.closeSync();
+  }
 }
 
 class ConnectionBase {
@@ -628,14 +799,20 @@ class ConnectionBase {
   prepareSync(sql, ...params) {
     throw new Error(DriverRequired);
   }
+  close() {
+    throw new Error(DriverRequired);
+  }
+  closeSync() {
+    throw new Error(DriverRequired);
+  }
 }
 
 class DefaultStrategy {
-  tableName(table) {
-    return table;
+  tableName(table2) {
+    return table2;
   }
-  columnName(column) {
-    return column;
+  columnName(column2) {
+    return column2;
   }
   tableFromDef(def) {
     return def.alias ?? def.name;
@@ -643,18 +820,18 @@ class DefaultStrategy {
 }
 
 class SnakeCaseStrategy {
-  tableName(table) {
-    return snakeCase(table);
+  tableName(table2) {
+    return snakeCase(table2);
   }
-  columnName(column) {
-    return snakeCase(column);
+  columnName(column2) {
+    return snakeCase(column2);
   }
   tableFromDef(def) {
     return snakeCase(def.alias ?? def.name);
   }
 }
 
-class FilterConnection {
+class SyncFilterConn {
   db;
   fn;
   $;
@@ -676,21 +853,54 @@ class FilterConnection {
   release() {
     this.db.connection = this.orig;
   }
+  closeSync() {
+    this.db.connection.closeSync();
+  }
+}
+function useFilterSync(db, filter) {
+  return new SyncFilterConn(db, filter);
+}
+
+class FilterConn {
+  db;
+  fn;
+  $;
+  orig;
+  constructor(db, fn) {
+    this.db = db;
+    this.fn = fn;
+    this.orig = db.connection;
+    db.connection = this;
+    this.$ = db.$;
+  }
+  get driver() {
+    return this.db.driver;
+  }
+  prepare(sql, ...params) {
+    this.fn(sql, params);
+    return this.orig.prepare(sql, ...params);
+  }
+  release() {
+    this.db.connection = this.orig;
+  }
+  close() {
+    return this.db.connection.close();
+  }
 }
 function useFilter(db, filter) {
-  return new FilterConnection(db, filter);
+  return new FilterConn(db, filter);
 }
 
 // src/inspect.ts
-function alignLeft(str, len, pad = " ") {
+function alignLeft(str, len, pad2 = " ") {
   if (len < 0)
     return "";
   let aLen = len + 1 - str.length;
   if (aLen <= 0)
     return str;
-  return pad + str + pad.repeat(len + 1 - str.length);
+  return pad2 + str + pad2.repeat(len + 1 - str.length);
 }
-function alignCenter(str, len, pad = " ") {
+function alignCenter(str, len, pad2 = " ") {
   if (len < 0)
     return "";
   if (!str)
@@ -698,20 +908,20 @@ function alignCenter(str, len, pad = " ") {
   let nLen = str.length;
   let half = Math.floor(len / 2 - nLen / 2);
   let odds = Math.abs(nLen % 2 - len % 2);
-  return pad.repeat(half + 1) + str + pad.repeat(half + 1 + odds);
+  return pad2.repeat(half + 1) + str + pad2.repeat(half + 1 + odds);
 }
-function alignRight(str, len, pad = " ") {
+function alignRight(str, len, pad2 = " ") {
   if (len < 0)
     return "";
   let aLen = len + 1 - str.length;
   if (aLen <= 0)
     return str;
-  return pad.repeat(len + 1 - str.length) + str + pad;
+  return pad2.repeat(len + 1 - str.length) + str + pad2;
 }
-function alignAuto(obj, len, pad = " ") {
+function alignAuto(obj, len, pad2 = " ") {
   let str = `${obj}`;
   if (str.length <= len) {
-    return IS.num(obj) ? alignRight(str, len, pad) : alignLeft(str, len, pad);
+    return IS.num(obj) ? alignRight(str, len, pad2) : alignLeft(str, len, pad2);
   }
   return str;
 }
@@ -819,12 +1029,12 @@ class Sql {
           sb += strings[i];
           if (i >= params.length)
             continue;
-          const value = params[i];
-          if (IS.sym(value)) {
-            sb += value.description ?? "";
-          } else if (IS.arr(value)) {
+          const val = params[i];
+          if (IS.sym(val)) {
+            sb += val.description ?? "";
+          } else if (IS.arr(val)) {
             let sbIn = "";
-            for (const item of value) {
+            for (const item of val) {
               const paramIndex = Object.keys(sqlParams).length + 1;
               const name = `_${paramIndex}`;
               if (sbIn.length)
@@ -833,16 +1043,16 @@ class Sql {
               sqlParams[name] = item;
             }
             sb += sbIn;
-          } else if (IS.rec(value) && value.$ref) {
-            sb += dialect.quoteTable(Meta.assert(value.$ref.cls).tableName);
-          } else if (IS.obj(value) && IS.fn(value.build)) {
-            const frag = value.build();
+          } else if (IS.rec(val) && val.$ref) {
+            sb += dialect.quoteTable(Meta.assert(val.$ref.cls).tableName);
+          } else if (IS.obj(val) && IS.fn(val.build)) {
+            const frag = val.build();
             const replaceParams = ["limit", "offset"];
             if (Object.keys(frag.params).some((x) => replaceParams.includes(x))) {
-              let i2 = nextParamVal(sqlParams);
               for (let orig of replaceParams) {
                 if (orig in frag.params) {
-                  const p = "_" + i2++;
+                  let i2 = nextParamVal(frag.params);
+                  const p = "_" + i2;
                   frag.params[p] = frag.params[orig];
                   delete frag.params[orig];
                   frag.sql = frag.sql.replaceAll(`\$${orig}`, `\$${p}`);
@@ -850,14 +1060,14 @@ class Sql {
               }
             }
             sb += mergeParams(sqlParams, frag).replaceAll("\n", "\n      ");
-          } else if (IS.obj(value) && IS.str(value.sql)) {
-            const frag = value;
+          } else if (IS.obj(val) && IS.str(val.sql)) {
+            const frag = val;
             sb += mergeParams(sqlParams, frag).replaceAll("\n", "\n      ");
-          } else if (value) {
+          } else if (val) {
             const paramIndex = Object.keys(sqlParams).length + 1;
             const name = `_${paramIndex}`;
             sb += `\$${name}`;
-            sqlParams[name] = value;
+            sqlParams[name] = val;
           }
         }
         return { sql: sb, params: sqlParams };
@@ -866,7 +1076,7 @@ class Sql {
       } else
         throw new Error(`sql(${typeof strings}) is invalid`);
     }
-    $.schema = new Schema(dialect);
+    $.schema = DriverRequiredProxy;
     $.dialect = dialect;
     $.quote = dialect.quote.bind(dialect);
     $.quoteColumn = dialect.quoteColumn.bind(dialect);
@@ -888,19 +1098,19 @@ class Sql {
     $.refs = function refs(...classes) {
       return classes.map((cls) => $.ref(cls));
     };
-    $.fragment = function(sql, params = {}) {
+    $.sql = function(sql, params = {}) {
       return IS.rec(sql) ? { sql: mergeParams(params, sql), params } : { sql, params };
     };
-    $.from = function(table, alias) {
-      const cls = asType(table);
-      const ref = asRef(table) ?? $.ref(table, alias ?? "");
+    $.from = function(table2, alias) {
+      const cls = asType(table2);
+      const ref = asRef(table2) ?? $.ref(table2, alias ?? "");
       return new SelectQuery($, [cls], [Meta.assert(cls)], [ref]);
     };
-    $.update = function(table) {
-      return new UpdateQuery($, [table], [Meta.assert(table)], [$.ref(table, "")]);
+    $.update = function(table2) {
+      return new UpdateQuery($, [table2], [Meta.assert(table2)], [$.ref(table2, "")]);
     };
-    $.deleteFrom = function(table) {
-      return new DeleteQuery($, [table], [Meta.assert(table)], [$.ref(table, "")]);
+    $.deleteFrom = function(table2) {
+      return new DeleteQuery($, [table2], [Meta.assert(table2)], [$.ref(table2, "")]);
     };
     $.join = function(...tables) {
       return new SqlJoinBuilder($, ...tables);
@@ -915,7 +1125,7 @@ class Sql {
       return new SqlOrderByBuilder($, ...tables);
     };
     $.idEquals = function hasId(id) {
-      return (x) => $.fragment($`${x.id} = $id`, { id });
+      return (x) => $.sql($`${x.id} = $id`, { id });
     };
     $.log = function(obj) {
       console.log(Inspect.dump(obj));
@@ -1104,28 +1314,28 @@ class WhereQuery {
       return ret;
     });
   }
-  createInstance(table, ref) {
-    const meta = Meta.assert(table);
-    ref = ref ?? this.$.ref(table);
-    return new this.constructor(this.$, [...this.tables, table], [...this.metas, meta], [...this.refs, ref]);
+  createInstance(table2, ref) {
+    const meta = Meta.assert(table2);
+    ref = ref ?? this.$.ref(table2);
+    return new this.constructor(this.$, [...this.tables, table2], [...this.metas, meta], [...this.refs, ref]);
   }
-  copyInto(instance) {
-    instance.params = Object.assign({}, this.params);
-    instance._where = Array.from(this._where);
-    instance._joins = Array.from(this._joins);
-    return instance;
+  copyInto(o) {
+    o.params = Object.assign({}, this.params);
+    o._where = Array.from(this._where);
+    o._joins = Array.from(this._joins);
+    return o;
   }
   clone() {
-    const instance = new this.constructor(this.$, [...this.tables], [...this.metas], [...this.refs]);
-    this.copyInto(instance);
-    return instance;
+    const o = new this.constructor(this.$, [...this.tables], [...this.metas], [...this.refs]);
+    this.copyInto(o);
+    return o;
   }
   addJoin(options) {
-    const table = options.cls;
-    const ref = options?.ref ?? (options.as ? this.$.ref(table, options.as) : undefined);
-    const instance = this.createInstance(table, ref);
-    this.copyInto(instance);
-    let q = instance;
+    const table2 = options.cls;
+    const ref = options?.ref ?? (options.as ? this.$.ref(table2, options.as) : undefined);
+    const o = this.createInstance(table2, ref);
+    this.copyInto(o);
+    let q = o;
     if (!q.refs[0].$ref.as) {
       q.refs[0] = q.$.ref(q.meta.cls, q.quoteTable(q.meta.tableName));
     }
@@ -1138,8 +1348,8 @@ class WhereQuery {
       const sql = assertSql(options.on.call(q, ...refs));
       on = qProtected.mergeParams(sql);
     }
-    qProtected._joins.push({ type: options.type, table, on, params: options.params });
-    return instance;
+    qProtected._joins.push({ type: options.type, table: table2, on, params: options.params });
+    return o;
   }
   joinBuilder(builder, typeHint = "JOIN") {
     const cls = builder.tables[0];
@@ -1227,13 +1437,13 @@ class WhereQuery {
   quote(symbol) {
     return this.$.quote(symbol);
   }
-  quoteTable(table) {
-    return this.$.quoteTable(table);
+  quoteTable(table2) {
+    return this.$.quoteTable(table2);
   }
-  quoteColumn(column) {
+  quoteColumn(column2) {
     const as = this.ref.$ref.as;
     const prefix = as ? as + "." : "";
-    return prefix + this.$.quoteColumn(column);
+    return prefix + this.$.quoteColumn(column2);
   }
   as(alias) {
     this.refs[0] = this.$.ref(this.refs[0].$ref.cls, alias);
@@ -1241,8 +1451,8 @@ class WhereQuery {
   }
   addParams(params) {
     if (params && IS.rec(params)) {
-      for (const [key, value] of Object.entries(params)) {
-        this.params[key] = value;
+      for (const [key, val] of Object.entries(params)) {
+        this.params[key] = val;
       }
     }
   }
@@ -1261,23 +1471,23 @@ class WhereQuery {
         throw new Error(`${op} requires an array of property names, but was: ${toStr(values)}`);
       let columnNames = [];
       for (const key of values) {
-        const prop = this.meta.props.find((x) => x.name === key);
-        if (!prop)
+        const p = this.meta.props.find((x) => x.name === key);
+        if (!p)
           throw new Error(`Property ${key} not found in ${this.meta.name}`);
-        if (!prop.column)
+        if (!p.column)
           throw new Error(`Property ${key} is not a column`);
-        columnNames.push(prop.column.name);
+        columnNames.push(p.column.name);
       }
       const sql = columnNames.map((name) => `${this.$.quoteColumn(name)} ${Sql.ops[op]}`).join(` ${condition} `);
       this._where.push({ condition, sql });
     } else if (IS.rec(values)) {
       for (const [key, value] of Object.entries(values)) {
-        const prop = this.meta.props.find((x) => x.name === key);
-        if (!prop)
+        const p = this.meta.props.find((x) => x.name === key);
+        if (!p)
           throw new Error(`Property ${key} not found in ${this.meta.name}`);
-        if (!prop.column)
+        if (!p.column)
           throw new Error(`Property ${key} is not a column`);
-        const sqlLeft = `${this.$.quoteColumn(prop.column.name)} ${sqlOp}`;
+        const sqlLeft = `${this.$.quoteColumn(p.column.name)} ${sqlOp}`;
         if (IS.arr(value)) {
           let sqlValues = ``;
           for (const v in value) {
@@ -1289,9 +1499,9 @@ class WhereQuery {
           }
           this._where.push({ condition, sql: `${sqlLeft} (${sqlValues})` });
         } else {
-          this._where.push({ condition, sql: `${sqlLeft} \$${prop.name}` });
+          this._where.push({ condition, sql: `${sqlLeft} \$${p.name}` });
           let paramValue = op === "startsWith" ? `${value}%` : op === "endsWith" ? `%${value}` : op === "contains" ? `%${value}%` : value;
-          this.params[prop.name] = paramValue;
+          this.params[p.name] = paramValue;
         }
       }
     } else
@@ -1315,8 +1525,8 @@ class WhereQuery {
     for (let i = 0;i < this._joins.length; i++) {
       const { type: type2, on } = this._joins[i];
       const ref = this.refs[i + 1];
-      const meta = this.metas[i + 1];
-      const quotedTable = this.$.quoteTable(meta.tableName);
+      const M = this.metas[i + 1];
+      const quotedTable = this.$.quoteTable(M.tableName);
       const refAs = ref.$ref.as;
       const sqlAs = refAs && refAs !== quotedTable ? ` ${refAs}` : "";
       const sqlOn = IS.str(on) ? ` ON ${on}` : "";
@@ -1332,7 +1542,7 @@ class WhereQuery {
   }
   build() {
     const sql = this.buildWhere();
-    const params = this.params;
+    const params = sortParams(this.params);
     return { sql, params };
   }
   toString(level) {
@@ -1378,14 +1588,14 @@ class SelectQuery extends WhereQuery {
   _skip;
   _take;
   _limit;
-  copyInto(instance) {
-    super.copyInto(instance);
-    instance._select = Array.from(this._select);
-    instance._groupBy = Array.from(this._groupBy);
-    instance._having = Array.from(this._having);
-    instance._skip = this._skip;
-    instance._take = this._take;
-    return instance;
+  copyInto(o) {
+    super.copyInto(o);
+    o._select = Array.from(this._select);
+    o._groupBy = Array.from(this._groupBy);
+    o._having = Array.from(this._having);
+    o._skip = this._skip;
+    o._take = this._take;
+    return o;
   }
   clone() {
     return super.clone();
@@ -1400,8 +1610,8 @@ class SelectQuery extends WhereQuery {
       const frag = assertSql(options.call(this, ...this.refs));
       this._groupBy.push(this.mergeParams(frag));
     } else if (IS.rec(options)) {
-      const frag = IS.fn(options.build) ? options.build(this.refs) : assertSql(options);
-      this._groupBy.push(this.mergeParams(frag));
+      const f = IS.fn(options.build) ? options.build(this.refs) : assertSql(options);
+      this._groupBy.push(this.mergeParams(f));
     } else
       throw EX.arg(options);
     return this;
@@ -1416,8 +1626,8 @@ class SelectQuery extends WhereQuery {
       const frag = assertSql(options.call(this, ...this.refs));
       this._having.push(this.mergeParams(frag));
     } else if (IS.rec(options)) {
-      const frag = IS.fn(options.build) ? options.build(this.refs) : assertSql(options);
-      this._having.push(this.mergeParams(frag));
+      const f = IS.fn(options.build) ? options.build(this.refs) : assertSql(options);
+      this._having.push(this.mergeParams(f));
     } else
       throw EX.arg(options);
     return this;
@@ -1432,8 +1642,8 @@ class SelectQuery extends WhereQuery {
       const frag = assertSql(options.call(this, ...this.refs));
       this._orderBy.push(this.mergeParams(frag));
     } else if (IS.rec(options)) {
-      const frag = IS.fn(options.build) ? options.build(this.refs) : assertSql(options);
-      this._orderBy.push(this.mergeParams(frag));
+      const f = IS.fn(options.build) ? options.build(this.refs) : assertSql(options);
+      this._orderBy.push(this.mergeParams(f));
     } else
       throw EX.arg(options);
     return this;
@@ -1454,15 +1664,15 @@ class SelectQuery extends WhereQuery {
     } else if (IS.rec(options)) {
       const o = options;
       if (o.sql) {
-        const frag = o.sql;
-        this._select.push(frag.sql);
-        this.addParams(frag.params);
+        const f = o.sql;
+        this._select.push(f.sql);
+        this.addParams(f.params);
       }
       if (o.props) {
         for (const name of o.props) {
-          const column = this.meta.props.find((x) => x.name == name)?.column;
-          if (column) {
-            this._select.push(this.quoteColumn(column.name));
+          const col = this.meta.props.find((x) => x.name == name)?.column;
+          if (col) {
+            this._select.push(this.quoteColumn(col.name));
           }
         }
       }
@@ -1494,8 +1704,8 @@ class SelectQuery extends WhereQuery {
     if (take == null && skip == null) {
       this._limit = undefined;
     } else {
-      const frag = this.$.dialect.sqlLimit(this._skip, this._take);
-      this._limit = this.mergeParams(frag);
+      const f = this.$.dialect.sqlLimit(this._skip, this._take);
+      this._limit = this.mergeParams(f);
     }
     return this;
   }
@@ -1507,7 +1717,7 @@ class SelectQuery extends WhereQuery {
   }
   rowCount() {
     const { sql, params } = this.build();
-    return { sql: `SELECT COUNT(*) FROM (${sql}) AS COUNT`, params, into: Number };
+    return { sql: this.$.schema.sqlRowCount(sql), params, into: Number };
   }
   buildSelect() {
     const sqlSelect = this._select.length > 0 ? this._select.join(", ") : this.meta.columns.map((x) => this.quoteColumn(x.name)).join(", ");
@@ -1543,7 +1753,7 @@ class SelectQuery extends WhereQuery {
   }
   build() {
     let sql = this.buildSelect() + this.buildFrom() + this.buildJoins() + this.buildWhere() + this.buildGroupBy() + this.buildHaving() + this.buildOrderBy() + this.buildLimit();
-    const params = this.params;
+    const params = sortParams(this.params);
     const into = this._select.length == 0 ? this.tables[0] : undefined;
     return { sql, params, into };
   }
@@ -1559,24 +1769,24 @@ class UpdateQuery extends WhereQuery {
       this._set.length = 0;
     }
     if (IS.tpl(options)) {
-      const frag = this.$(options, ...params);
-      this._set.push(this.mergeParams(frag));
+      const f = this.$(options, ...params);
+      this._set.push(this.mergeParams(f));
     } else if (IS.fn(options)) {
-      const frag = assertSql(options.call(this, ...this.refs));
-      this._set.push(this.mergeParams(frag));
+      const f = assertSql(options.call(this, ...this.refs));
+      this._set.push(this.mergeParams(f));
     } else if (IS.rec(options)) {
       if ("sql" in options) {
-        const frag = options;
-        this._set.push(this.mergeParams(frag));
+        const f = options;
+        this._set.push(this.mergeParams(f));
       } else {
         for (const [key, value] of Object.entries(options)) {
-          const prop = this.meta.props.find((x) => x.name === key);
-          if (!prop)
+          const p = this.meta.props.find((x) => x.name === key);
+          if (!p)
             throw new Error(`Property ${key} not found in ${this.meta.name}`);
-          if (!prop.column)
+          if (!p.column)
             throw new Error(`Property ${key} is not a column`);
-          this.params[prop.name] = value;
-          this._set.push(`${this.$.quote(prop.column.name)} = \$${prop.name}`);
+          this.params[p.name] = value;
+          this._set.push(`${this.$.quote(p.column.name)} = \$${p.name}`);
         }
       }
     } else
@@ -1611,74 +1821,6 @@ class DeleteQuery extends WhereQuery {
   }
 }
 
-// src/model.ts
-function table(options) {
-  return function(target) {
-    const table2 = Object.assign({}, options, { name: options?.alias ?? target.name });
-    if (!target.$id)
-      target.$id = Symbol(target.name);
-    target.$type ??= { name: target.name };
-    target.$type.table = table2;
-  };
-}
-function column(type2, options) {
-  return function(target, propertyKey) {
-    const column2 = Object.assign({}, options, { type: type2, name: options?.alias ?? propertyKey });
-    if (propertyKey === "id" || options?.autoIncrement)
-      column2.primaryKey = true;
-    if (!target.constructor.$id)
-      target.constructor.$id = Symbol(target.constructor.name);
-    const props = target.constructor.$props ?? (target.constructor.$props = []);
-    let prop = props.find((x) => x.name === propertyKey);
-    if (!prop) {
-      prop = { name: propertyKey };
-      props.push(prop);
-    }
-    prop.column = column2;
-    if (IS.sym(prop.column.type)) {
-      prop.column.type = prop.column.type.description;
-    }
-  };
-}
-function Table(cls, definition) {
-  if (!definition)
-    throw new Error("Table definition is required");
-  const meta = cls;
-  if (!meta.$id)
-    meta.$id = Symbol(cls.name);
-  meta.$type ??= { name: cls.name };
-  meta.$type.table = definition.table ?? {};
-  meta.$type.table.name ??= cls.name;
-  const props = meta.$props ?? (meta.$props = []);
-  Object.keys(definition.columns ?? {}).forEach((name) => {
-    const column2 = definition.columns[name];
-    if (!column2)
-      throw new Error(`Column definition for ${name} is missing`);
-    if (!column2.type)
-      throw new Error(`Column type for ${name} is missing`);
-    if (name === "id" || column2?.autoIncrement)
-      column2.primaryKey = true;
-    let prop = props.find((x) => x.name === name);
-    if (!prop) {
-      prop = { name };
-      props.push(prop);
-    }
-    prop.column = column2;
-    prop.column.name ??= column2.alias ?? name;
-    if (IS.sym(prop.column.type)) {
-      prop.column.type = prop.column.type.description;
-    }
-  });
-  return cls;
-}
-var DefaultValues = {
-  NOW: "{NOW}",
-  MAX_TEXT: "{MAX_TEXT}",
-  MAX_TEXT_UNICODE: "{MAX_TEXT_UNICODE}",
-  TRUE: "{TRUE}",
-  FALSE: "{FALSE}"
-};
-
 // src/sqlite/dialect.ts
 class SqliteDialect {
   $;
@@ -1698,76 +1840,15 @@ class SqliteDialect {
   sqlLimit(offset, limit) {
     if (offset == null && limit == null)
       throw new Error(`Invalid argument sqlLimit(${offset}, ${limit})`);
-    const frag = offset ? this.$.fragment(`LIMIT \$limit OFFSET \$offset`, { offset, limit: limit ?? -1 }) : this.$.fragment(`LIMIT \$limit`, { limit });
+    const frag = offset ? this.$.sql(`LIMIT \$limit OFFSET \$offset`, { offset, limit: limit ?? -1 }) : this.$.sql(`LIMIT \$limit`, { limit });
     return frag;
   }
 }
 
 // src/sqlite/schema.ts
 class SqliteSchema extends Schema {
-  driver;
-  constructor(driver) {
-    super(driver.dialect);
-    this.driver = driver;
-  }
   sqlTableNames() {
     return "SELECT name FROM sqlite_master WHERE type ='table' AND name NOT LIKE 'sqlite_%'";
-  }
-  sqlIndexDefinition(table2, column2) {
-    const unique = column2.unique ? "UNIQUE INDEX" : "INDEX";
-    const name = `idx_${table2.name}_${column2.name}`.toLowerCase();
-    return `CREATE ${unique} ${name} ON ${this.dialect.quoteTable(table2.name)} (${this.dialect.quoteColumn(column2.name)})`;
-  }
-  sqlForeignKeyDefinition(table2, column2) {
-    const ref = column2.references;
-    if (!ref)
-      return "";
-    const $ = this.driver.$;
-    const refMeta = Array.isArray(ref.table) ? Meta.assert(ref.table[0]) : Meta.assert(ref.table);
-    const refKeys = Array.isArray(ref.table) ? Array.isArray(ref.table[1]) ? ref.table[1].map((x) => $.quoteColumn(x)).join(",") : $.quoteColumn(ref.table[1]) : refMeta.columns.filter((x) => x.primaryKey).map((x) => $.quoteColumn(x.name)).join(",");
-    let sql = `FOREIGN KEY (${$.quoteColumn(column2.name)}) REFERENCES ${$.quoteTable(refMeta.tableName)}${refKeys ? "(" + refKeys + ")" : ""}`;
-    if (ref.on) {
-      sql += ` ON ${ref.on[0]} ${ref.on[1]}`;
-    }
-    return sql;
-  }
-  sqlColumnDefinition(column2) {
-    let dataType = column2.type;
-    let type2 = this.driver.types.native.includes(dataType) ? dataType : undefined;
-    if (!type2) {
-      for (const [sqliteType, typeMapping] of Object.entries(this.driver.types.map)) {
-        if (typeMapping.includes(dataType)) {
-          type2 = sqliteType;
-          break;
-        }
-      }
-    }
-    if (!type2)
-      type2 = dataType;
-    let sb = `${this.dialect.quoteColumn(column2.name)} ${type2}`;
-    if (column2.primaryKey) {
-      sb += " PRIMARY KEY";
-    }
-    if (column2.autoIncrement) {
-      sb += " AUTOINCREMENT";
-    }
-    if (column2.required) {
-      sb += " NOT NULL";
-    }
-    if (column2.unique && !column2.index) {
-      sb += " UNIQUE";
-    }
-    if (column2.defaultValue) {
-      const val = this.driver.variables[column2.defaultValue] ?? column2.defaultValue;
-      sb += ` DEFAULT ${val}`;
-    }
-    return sb;
-  }
-  sqlLimit(offset, limit) {
-    if (offset == null && limit == null)
-      throw new Error(`Invalid argument sqlLimit(${offset}, ${limit})`);
-    const frag = offset ? this.driver.$.fragment(`LIMIT \$limit OFFSET \$offset`, { offset, limit: limit ?? -1 }) : this.driver.$.fragment(`LIMIT \$limit`, { limit });
-    return frag;
   }
 }
 
@@ -1817,23 +1898,11 @@ class Sqlite {
   schema;
   strategy = new DefaultStrategy;
   $;
-  variables = {
-    [DefaultValues.NOW]: "CURRENT_TIMESTAMP",
-    [DefaultValues.MAX_TEXT]: "TEXT",
-    [DefaultValues.MAX_TEXT_UNICODE]: "TEXT",
-    [DefaultValues.TRUE]: "1",
-    [DefaultValues.FALSE]: "0"
-  };
-  types;
-  converters = {
-    ...converterFor(DateTimeConverter.instance, "DATE", "DATETIME", "TIMESTAMP", "TIMESTAMPZ")
-  };
   constructor() {
     this.name = this.constructor.name;
     this.dialect = new SqliteDialect;
     this.$ = this.dialect.$;
-    this.types = new SqliteTypes;
-    this.schema = this.$.schema = new SqliteSchema(this);
+    this.schema = this.$.schema = new SqliteSchema(this, this.$, new SqliteTypes);
   }
 }
 
@@ -1859,13 +1928,56 @@ class MySqlDialect {
   sqlLimit(offset, limit) {
     if (offset == null && limit == null)
       throw new Error(`Invalid argument sqlLimit(${offset}, ${limit})`);
-    const frag = offset ? limit ? this.$.fragment(`LIMIT \$offset, \$limit`, { offset, limit }) : this.$.fragment(`LIMIT \$offset, 18446744073709551615`, { offset }) : this.$.fragment(`LIMIT \$limit`, { limit });
-    return frag;
+    const f = offset ? limit ? this.$.sql(`LIMIT \$offset, \$limit`, { offset, limit }) : this.$.sql(`LIMIT \$offset, 18446744073709551615`, { offset }) : this.$.sql(`LIMIT \$limit`, { limit });
+    return f;
   }
 }
 
 // src/mysql/schema.ts
-class MySqlSchema extends SqliteSchema {
+class DateConverter {
+  toDb(value) {
+    const d = toDate(value);
+    return d ? dateISOString(d).replace("T", " ") : null;
+  }
+  fromDb(value) {
+    if (!value)
+      return null;
+    return toDate(value);
+  }
+}
+
+class MySqlSchema extends Schema {
+  constructor(driver, $, types) {
+    super(driver, $, types);
+    Object.assign(this.converters, converterFor(new DateConverter, "DATE", "DATETIME", "TIMESTAMP", "TIMESTAMPZ"));
+  }
+  sqlIndexDefinition(table2, col) {
+    const unique = col.unique ? "UNIQUE INDEX" : "INDEX";
+    const name = `idx_${table2.name}_${col.name}`.toLowerCase();
+    const indexSize = col.type.endsWith("TEXT") ? "(255)" : "";
+    return `CREATE ${unique} ${name} ON ${this.quoteTable(table2.name)} (${this.quoteColumn(col.name)}${indexSize})`;
+  }
+  sqlColumnDefinition(col) {
+    let type2 = this.dataType(col);
+    let sb = `${this.quoteColumn(col.name)} ${type2}`;
+    if (col.primaryKey) {
+      sb += " PRIMARY KEY";
+    }
+    if (col.autoIncrement) {
+      sb += " AUTO_INCREMENT";
+    }
+    if (col.required) {
+      sb += " NOT NULL";
+    }
+    if (col.unique && !col.index) {
+      sb += " UNIQUE";
+    }
+    sb += this.defaultValue(col);
+    return sb;
+  }
+  sqlTableNames() {
+    return super.sqlTableNames() + " AND table_schema = DATABASE()";
+  }
 }
 
 // src/mysql/driver.ts
@@ -1916,8 +2028,7 @@ class MySql extends Sqlite {
     super();
     this.dialect = new MySqlDialect;
     this.$ = this.dialect.$;
-    this.types = new MySqlTypes;
-    this.schema = this.$.schema = new MySqlSchema(this);
+    this.schema = this.$.schema = new MySqlSchema(this, this.$, new MySqlTypes);
   }
 }
 
@@ -1943,13 +2054,34 @@ class PostgreSqlDialect {
   sqlLimit(offset, limit) {
     if (offset == null && limit == null)
       throw new Error(`Invalid argument sqlLimit(${offset}, ${limit})`);
-    const frag = offset ? limit ? this.$.fragment(`LIMIT \$limit OFFSET \$offset`, { offset, limit }) : this.$.fragment(`OFFSET \$offset`, { offset }) : this.$.fragment(`LIMIT \$limit`, { limit });
+    const frag = offset ? limit ? this.$.sql(`LIMIT \$limit OFFSET \$offset`, { offset, limit }) : this.$.sql(`OFFSET \$offset`, { offset }) : this.$.sql(`LIMIT \$limit`, { limit });
     return frag;
   }
 }
 
 // src/postgres/schema.ts
-class PostgreSqlSchema extends SqliteSchema {
+class PostgreSqlSchema extends Schema {
+  sqlColumnDefinition(col) {
+    let type2 = this.dataType(col);
+    if (col.autoIncrement) {
+      type2 = type2 == "BIGINT" ? "BIGSERIAL" : "SERIAL";
+    }
+    let sb = `${this.quoteColumn(col.name)} ${type2}`;
+    if (col.primaryKey) {
+      sb += " PRIMARY KEY";
+    }
+    if (col.required) {
+      sb += " NOT NULL";
+    }
+    if (col.unique && !col.index) {
+      sb += " UNIQUE";
+    }
+    sb += this.defaultValue(col);
+    return sb;
+  }
+  sqlRowCount(sql) {
+    return `SELECT COUNT(*)::int FROM (${sql}) AS COUNT`;
+  }
 }
 
 // src/postgres/driver.ts
@@ -1967,7 +2099,6 @@ class PostgreSqlTypes {
     "MONEY",
     "BOOLEAN",
     "DATE",
-    "DATETIME",
     "TIME",
     "TIMEZ",
     "TIMESTAMP",
@@ -1981,7 +2112,9 @@ class PostgreSqlTypes {
     "BYTES",
     "BIT"
   ];
-  map = {};
+  map = {
+    TIMESTAMPTZ: ["DATETIME"]
+  };
 }
 
 class PostgreSql extends Sqlite {
@@ -1998,8 +2131,7 @@ class PostgreSql extends Sqlite {
     super();
     this.dialect = new PostgreSqlDialect;
     this.$ = this.dialect.$;
-    this.types = new PostgreSqlTypes;
-    this.schema = this.$.schema = new PostgreSqlSchema(this);
+    this.schema = this.$.schema = new PostgreSqlSchema(this, this.$, new PostgreSqlTypes);
   }
 }
 
@@ -2017,24 +2149,34 @@ var postgres = (() => {
   return PostgreSql.init().$;
 })();
 export {
+  useFilterSync,
   useFilter,
+  uniqueKeys,
   toStr,
+  toDate,
   table,
   sqlite,
+  sortParams,
   snakeCase,
   postgres,
   pick,
+  pad,
   omit,
+  nextParamVal,
   nextParam,
   mysql,
   mergeParams,
+  dateISOString,
   converterFor,
   column,
+  asType,
+  asRef,
   WhereQuery,
   Watch,
   UpdateQuery,
   Table,
   SyncDbConnection,
+  SqliteTypes,
   SqliteSchema,
   SqliteDialect,
   Sqlite,
@@ -2042,9 +2184,11 @@ export {
   SnakeCaseStrategy,
   SelectQuery,
   Schema,
+  PostgreSqlTypes,
   PostgreSqlSchema,
   PostgreSqlDialect,
   PostgreSql,
+  MySqlTypes,
   MySqlSchema,
   MySqlDialect,
   MySql,

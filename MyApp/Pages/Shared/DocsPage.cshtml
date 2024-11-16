@@ -267,6 +267,11 @@
     </div>    
 </div>
 
+@if (docMjs != null)
+{
+    @await Html.PartialAsync("CodeMirrorIncludes")
+}
+
 <script>
 //doc instructions
 if (document.querySelector('.hide-title')) {
@@ -314,3 +319,4 @@ mount('#sidebar', Sidebar)
 <script>hljs.highlightAll()</script>
 <script src="/lib/js/lite-yt-embed.js"></script>
 <script src="/mjs/docs.mjs" type="module"></script>
+    

@@ -36,6 +36,7 @@ const hostFiles = [
     'MarkdownPagesBase.cs',
     'MarkdownTagHelper.cs',
 ]
+hostFiles.length = 0
 
 const path = require('path')
 const fs = require('fs').promises

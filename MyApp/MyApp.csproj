@@ -31,6 +31,22 @@
 
   <ItemGroup>
     <_ContentIncludedByDefault Remove="_pages\vue\sidebar.json" />
+    <_ContentIncludedByDefault Remove="wwwroot\lib\codemirror\codemirror.js" />
+    <_ContentIncludedByDefault Remove="wwwroot\lib\codemirror\edit\closebrackets.js" />
+    <_ContentIncludedByDefault Remove="wwwroot\lib\codemirror\edit\closetag.js" />
+    <_ContentIncludedByDefault Remove="wwwroot\lib\codemirror\edit\continuelist.js" />
+    <_ContentIncludedByDefault Remove="wwwroot\lib\codemirror\edit\matchbrackets.js" />
+    <_ContentIncludedByDefault Remove="wwwroot\lib\codemirror\edit\matchtags.js" />
+    <_ContentIncludedByDefault Remove="wwwroot\lib\codemirror\edit\trailingspace.js" />
+    <_ContentIncludedByDefault Remove="wwwroot\lib\codemirror\javascript\index.html" />
+    <_ContentIncludedByDefault Remove="wwwroot\lib\codemirror\javascript\javascript.js" />
+    <_ContentIncludedByDefault Remove="wwwroot\lib\codemirror\javascript\typescript.html" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="wwwroot\codemirror\addon\" />
+    <Folder Include="wwwroot\codemirror\mode\" />
+    <Folder Include="wwwroot\codemirror\theme\" />
   </ItemGroup>
 
 </Project>
