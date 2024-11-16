@@ -2,7 +2,7 @@ import { onMounted, ref, nextTick } from "vue"
 import * as litdb from "litdb"
 import * as models from "../models.mjs"
 
-const { Sqlite, DbConnection, SyncDbConnection } = litdb
+const { Sqlite, DbConnection, SyncDbConnection, IS } = litdb
 
 class SqlCaptureStatement {
     constructor(sql, params, log) {
@@ -57,13 +57,24 @@ class SqlCaptureConnection {
     prepare(sql, ...params) { throw new Error("Not implemented") }
     
     prepareSync(sql, ...params) {
-        return new SqlCaptureStatement(sql, params, this.log)
+        if (IS.tpl(sql)) {
+            let sb = ''
+            for (let i = 0; i < sql.length; i++) {
+                sb += sql[i]
+                if (i < params.length) {
+                    sb += `?`
+                }
+            }
+            return new SqlCaptureStatement(sb, [], this.log)
+        } else {
+            return new SqlCaptureStatement(sql, params, this.log)
+        }
     }
     close() { return Promise.resolve() }
     closeSync() { }
 }
 
-function scopedExpr(src, ctx) {
+function scopedExpr(src, ctx, expr) {
     const invalidTokens = ['function','Function','eval']
     if (invalidTokens.some(x => src.includes(x))) {
         throw new Error(`Unsafe script: '${src}'`)
@@ -72,7 +83,9 @@ function scopedExpr(src, ctx) {
     const scope = Object.assign(Object.keys(globalThis).reduce((acc,k) => {
         acc[k] = undefined; return acc
     }, {}) , ctx)
-    return (new Function( "with(this) { " + src + " }")).call(scope)
+    return expr
+        ? (new Function( "with(this) { return (" + src + ") }")).call(scope)
+        : (new Function( "with(this) { " + src + " }")).call(scope)
 }
 
 export default {
@@ -87,7 +100,7 @@ export default {
             
         </div>
     `,
-    props:['src'],
+    props:['src','expr'],
     setup(props, { slots }) {
         const refInput = ref()
         const refPreview = ref()
@@ -111,7 +124,7 @@ export default {
                 code.value = getSlotChildrenText(slots.default()).trim()
             }
 
-            console.log('value', code.value)
+            //console.log('value', code.value)
             cm = CodeMirror(refInput.value, {
                 lineNumbers: true,
                 styleActiveLine : true,
@@ -126,9 +139,13 @@ export default {
                 const ctx = { ...models, ...litdb, $, db  }
                 try {
                     error.value = ''
-                    scopedExpr(code.value, ctx)
+                    const isExpr = props.expr || !code.value.includes('db.')
+                    const ret = scopedExpr(code.value, ctx, isExpr)
                     console.log(connection.log)
                     sql.value = connection.log.map(x => x.sql).join('\n')
+                    if (ret) {
+                        sql.value += `${ret}`
+                    }
                     nextTick(() => globalThis.hljs.highlightElement(refPreview.value))
                 } catch(e) {
                     error.value = e.message ?? `${e}`
