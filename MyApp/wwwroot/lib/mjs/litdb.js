@@ -1181,8 +1181,8 @@ class SqlJoinBuilder {
     return this;
   }
   build(refs) {
-    if (this.alias != null) {
-      refs[0].$ref.as = this.$.ref(refs[0].$ref.cls, this.alias);
+    if (this.alias) {
+      refs[0] = this.$.ref(refs[0].$ref.cls, this.alias);
     }
     const params = {};
     const sqls = [];
@@ -1355,8 +1355,14 @@ class WhereQuery {
     const cls = builder.tables[0];
     const q = this.createInstance(cls);
     this.copyInto(q);
-    const refs = builder.tables.map((cls2) => this.refOf(cls2) ?? this.$.ref(cls2));
+    const refs = builder.tables.map((cls2) => q.refOf(cls2) ?? q.$.ref(cls2));
     let { type: type2, on, params } = builder.build(refs, typeHint);
+    for (let i = 0;i < q.refs.length; i++) {
+      if (refs[0].$ref.cls == q.refs[i].$ref.cls) {
+        q.refs[i] = refs[0];
+        break;
+      }
+    }
     if (on && params) {
       on = this.mergeParams({ sql: on, params });
     }
@@ -1663,11 +1669,6 @@ class SelectQuery extends WhereQuery {
       this._select.push(this.mergeParams(sql));
     } else if (IS.rec(options)) {
       const o = options;
-      if (o.sql) {
-        const f = o.sql;
-        this._select.push(f.sql);
-        this.addParams(f.params);
-      }
       if (o.props) {
         for (const name of o.props) {
           const col = this.meta.props.find((x) => x.name == name)?.column;
@@ -2199,5 +2200,6 @@ export {
   DefaultValues,
   DefaultStrategy,
   DbConnection,
-  DateTimeConverter
+  DateTimeConverter,
+  ConnectionBase
 };
