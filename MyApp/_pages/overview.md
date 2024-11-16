@@ -13,10 +13,34 @@ constructing and executing typed SQL queries with a focus on type safety, best p
 The core `litdb` library provides a set of composable query builders and SQL fragments that can be used to generate
 SQL that can be executed on SQLite, MySQL and PostgreSQL.
 
+### SQL Expression
+
+The `$` tagged template function is used to create parameterized SQL Fragments that's split into `sql` and `params`:
+
+```ts
+type Fragment = { sql:string, params:Record<string,any> }
+```
+
+<live-preview>
+JSON.stringify($`id = ${1} OR name = ${'John'}`)
+</live-preview>
+
+### SQL Builder
+
+SQL Builders are just objects containing a `build()` function which returns a SQL `Fragment`:
+
+```ts
+interface SqlBuilder {
+    build(): Fragment
+}
+```
+
+Their simplicity and loose coupling allows them to be used in any ORM or driver that can execute parameterized SQL.
+
 ### litdb drivers
 
 The litdb Drivers provide a unified interface for executing custom parameterized SQL, SQL Builders and SQL Fragments 
-for their respective driver implementation. The SQLite drivers support both the Sync and Async DbConnection whilst
+for their respective RDBMS. The SQLite drivers support both the Sync and Async DbConnection whilst
 remote databases like PostgreSQL and MySQL only support the Async DbConnection.
 
 ```ts

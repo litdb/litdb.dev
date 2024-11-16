@@ -22,6 +22,7 @@ export class Contact {
     name = ''
     age = 0 || undefined
     email = ''
+    city = '' || undefined
     createdAt = new Date(2025,1,1)
 }
 export class Order {
@@ -52,6 +53,7 @@ Table(Contact, {
         name:      { type:"TEXT",     required:true },
         age:       { type:"INTEGER" },
         email:     { type:"TEXT",     required:true, index:true, unique:true },
+        city:      { type:"TEXT" },
         createdAt: { type:"DATETIME", defaultValue:"CURRENT_TIMESTAMP" },
     }
 })
@@ -104,9 +106,12 @@ export class Contact {
 
     @column("TEXT", { required:true, index:true, unique:true })
     email = ''
+
+    @column("TEXT")
+    city = ''
     
     @column("DATETIME", { defaultValue:'CURRENT_TIMESTAMP' })
-    createdAt = new Date(2025,1,1)
+    createdAt = new Date()
 }
 
 @table()
@@ -123,7 +128,7 @@ export class Order {
     total: number = 0
 
     @column("DATETIME", { defaultValue:DefaultValues.NOW })
-    createdAt = new Date(2025,1,1)
+    createdAt = new Date()
 }
 
 @table()

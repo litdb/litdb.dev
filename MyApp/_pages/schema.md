@@ -2,7 +2,9 @@
 title: Schema APIs
 ---
 
-Using data models defined in [/models](/models).
+:::info
+All live examples use the data models defined in [/models](/models).
+:::
 
 ## Create Table
 

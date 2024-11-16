@@ -58,6 +58,10 @@
         "link": "/joins"
       },
       {
+        "text": "Where",
+        "link": "/where"
+      },
+      {
         "text": "Insert",
         "link": "/insert"
       },
