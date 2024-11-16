@@ -235,7 +235,19 @@ Home                                    </span>
                 <div class="not-prose"></div>
 
                 <div class="content">
-                    
+                    <h2 id="simple-insert">Simple Insert<a class="header-anchor" href="javascript:;" onclick="location.hash='#simple-insert'" aria-label="Permalink">&ZeroWidthSpace;</a></h2>
+<live-preview>
+db.insert(new Contact({ name:'John', email:'john@email.com', age:27 }))
+db.insert(new Product({ sku:'W123', name:'Widget', cost:10 }))
+</live-preview>
+<h2 id="insert-multiple-rows">Insert Multiple Rows<a class="header-anchor" href="javascript:;" onclick="location.hash='#insert-multiple-rows'" aria-label="Permalink">&ZeroWidthSpace;</a></h2>
+<live-preview>
+db.insertAll([
+    new Contact({ name:'John', email:'john@email.com', age:27 }),
+    new Contact({ name:'Jane', email:'jane@email.com', age:31 })
+])
+</live-preview>
+
                 </div>
 
                 <div class="not-prose"></div>
@@ -271,6 +283,27 @@ Home                                    </span>
                     </div>
             </div>
                 
+                <div class="docmap hidden 2xl:block flex-none w-64 pl-8 mr-8">
+                    <div class="fixed bg-white dark:bg-black flex flex-col overflow-y-auto pt-10 px-8 pb-6" style="height:calc(100vh - 50px);">
+                        <div>
+                            <h5 class="text-slate-900 font-semibold mb-4 text-sm leading-6 dark:text-slate-100">
+                                On This Page
+                            </h5>
+                            <ul class="text-slate-700 text-sm leading-6">
+                                    <li class="group text-gray-800 hover:text-gray-900">
+                                        <span v-hash="'#simple-insert'" data-id="simple-insert" class="cursor-pointer font-medium block text-sm transform transition-colors duration-200 py-2">
+                                            Simple Insert
+                                        </span>
+                                    </li>
+                                    <li class="group text-gray-800 hover:text-gray-900">
+                                        <span v-hash="'#insert-multiple-rows'" data-id="insert-multiple-rows" class="cursor-pointer font-medium block text-sm transform transition-colors duration-200 py-2">
+                                            Insert Multiple Rows
+                                        </span>
+                                    </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
                 
         </div>
     </div>    

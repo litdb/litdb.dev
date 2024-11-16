@@ -264,7 +264,7 @@ $.from(Contact)
 <p><live-preview src="/mjs/subselect.mjs"></live-preview></p>
 <h2 id="where-convenience-options">WHERE convenience options<a class="header-anchor" href="javascript:;" onclick="location.hash='#where-convenience-options'" aria-label="Permalink">&ZeroWidthSpace;</a></h2>
 <p>The <code>where</code> method can also be called with an object containing a number of convenience options to simplify creating
-common queries with an object query.</p>
+common queries with an object query. If needed <code>op</code> can be used to create options for a custom SQL operator.</p>
 <live-preview>
 const search = {
     name: 'John',
@@ -275,7 +275,7 @@ db.all($.from(Contact).where({ equals: search }))
 db.all($.from(Contact).where({ notEquals: search }))
 db.all($.from(Contact).where({ like: { name:'John', city:'Austin' } }))
 db.all($.from(Contact).where({ notLike: { name:'John', city:'Austin' } }))
-db.all($.from(Contact).where({ notLike: { name:'John', city:'Austin' } }))
+db.all($.from(Contact).where({ op: ['>=', { id:10, age:18 }] }))
 </live-preview>
 <h3 id="like-convenience-options">LIKE convenience options<a class="header-anchor" href="javascript:;" onclick="location.hash='#like-convenience-options'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
 <p>The <code>startsWith</code>, <code>endsWith</code> and <code>contains</code> options can be used to create <strong>LIKE</strong> conditions that match the start,

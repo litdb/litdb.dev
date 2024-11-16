@@ -286,6 +286,18 @@ db.all($.from(o)
   .where`${o.createdAt} = (${recentOrder})`
   .select`${o.id}, ${c.name}, ${i.qty}, ${p.name}`)
 </live-preview>
+<h2 id="join-query-builder">JOIN query builder<a class="header-anchor" href="javascript:;" onclick="location.hash='#join-query-builder'" aria-label="Permalink">&ZeroWidthSpace;</a></h2>
+<p>When more flexibility is needed you can create a JOIN query builder with <code>$.join()</code> that can be added to other SELECT
+query builders to create complex queries.</p>
+<live-preview>
+$.from(Contact,'c')
+    .join(Order, { on:(c,o) => $`${c.id} = ${o.contactId}` })
+    .join(
+       $.join(OrderItem,Order,Product).as('i').leftJoin((i, o, p) => 
+         $`${o.id} = ${i.orderId} LEFT JOIN ${p} ON ${i.sku} = ${p.sku}`)
+    )
+    .select('*')
+</live-preview>
 
                 </div>
 
@@ -352,6 +364,11 @@ db.all($.from(o)
                                     <li class="group text-gray-800 hover:text-gray-900">
                                         <span v-hash="'#external-references'" data-id="external-references" class="cursor-pointer font-medium block text-sm transform transition-colors duration-200 py-2">
                                             External References
+                                        </span>
+                                    </li>
+                                    <li class="group text-gray-800 hover:text-gray-900">
+                                        <span v-hash="'#join-query-builder'" data-id="join-query-builder" class="cursor-pointer font-medium block text-sm transform transition-colors duration-200 py-2">
+                                            JOIN query builder
                                         </span>
                                     </li>
                             </ul>
