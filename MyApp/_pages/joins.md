@@ -68,3 +68,18 @@ db.all($.from(o)
   .where`${o.createdAt} = (${recentOrder})`
   .select`${o.id}, ${c.name}, ${i.qty}, ${p.name}`)
 </live-preview>
+
+## JOIN query builder
+
+When more flexibility is needed you can create a JOIN query builder with `$.join()` that can be added to other SELECT
+query builders to create complex queries.
+
+<live-preview>
+$.from(Contact,'c')
+    .join(Order, { on:(c,o) => $`${c.id} = ${o.contactId}` })
+    .join(
+       $.join(OrderItem,Order,Product).as('i').leftJoin((i, o, p) => 
+         $`${o.id} = ${i.orderId} LEFT JOIN ${p} ON ${i.sku} = ${p.sku}`)
+    )
+    .select('*')
+</live-preview>

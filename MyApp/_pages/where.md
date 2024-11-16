@@ -44,7 +44,7 @@ Similarly, Query Builders can be embedded in other Query Builders to create subq
 ## WHERE convenience options
 
 The `where` method can also be called with an object containing a number of convenience options to simplify creating
-common queries with an object query.
+common queries with an object query. If needed `op` can be used to create options for a custom SQL operator.
 
 <live-preview>
 const search = {
@@ -56,7 +56,7 @@ db.all($.from(Contact).where({ equals: search }))
 db.all($.from(Contact).where({ notEquals: search }))
 db.all($.from(Contact).where({ like: { name:'John', city:'Austin' } }))
 db.all($.from(Contact).where({ notLike: { name:'John', city:'Austin' } }))
-db.all($.from(Contact).where({ notLike: { name:'John', city:'Austin' } }))
+db.all($.from(Contact).where({ op: ['>=', { id:10, age:18 }] }))
 </live-preview>
 
 ### LIKE convenience options
