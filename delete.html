@@ -235,7 +235,24 @@ Home                                    </span>
                 <div class="not-prose"></div>
 
                 <div class="content">
-                    
+                    <h2 id="simple-delete">Simple DELETE<a class="header-anchor" href="javascript:;" onclick="location.hash='#simple-delete'" aria-label="Permalink">&ZeroWidthSpace;</a></h2>
+<p>Delete an entity using the <code>db.delete</code> driver method:</p>
+<live-preview>
+db.delete(new Contact({ name:'John', email:'john@email.com', age:27 }))
+</live-preview>
+<h2 id="delete-query-builder">DELETE Query Builder<a class="header-anchor" href="javascript:;" onclick="location.hash='#delete-query-builder'" aria-label="Permalink">&ZeroWidthSpace;</a></h2>
+<p>When a custom query is needed you can use <code>$.deleteFrom()</code> to create a DELETE query builder:</p>
+<live-preview>
+const yearAgo = new Date(new Date().setFullYear(new Date().getFullYear() - 1))
+db.run($.deleteFrom(Order).where(c => $`${c.createdAt} < ${yearAgo}`))
+</live-preview>
+<h2 id="delete-expression">DELETE Expression<a class="header-anchor" href="javascript:;" onclick="location.hash='#delete-expression'" aria-label="Permalink">&ZeroWidthSpace;</a></h2>
+<p>When the full flexibility of SQL is needed, you can execute a SQL fragment directly:</p>
+<live-preview>
+const name = 'John'
+db.run`DELETE FROM Contact WHERE name = ${name}`
+</live-preview>
+
                 </div>
 
                 <div class="not-prose"></div>
@@ -264,6 +281,32 @@ Home                                    </span>
                     </div>
             </div>
                 
+                <div class="docmap hidden 2xl:block flex-none w-64 pl-8 mr-8">
+                    <div class="fixed bg-white dark:bg-black flex flex-col overflow-y-auto pt-10 px-8 pb-6" style="height:calc(100vh - 50px);">
+                        <div>
+                            <h5 class="text-slate-900 font-semibold mb-4 text-sm leading-6 dark:text-slate-100">
+                                On This Page
+                            </h5>
+                            <ul class="text-slate-700 text-sm leading-6">
+                                    <li class="group text-gray-800 hover:text-gray-900">
+                                        <span v-hash="'#simple-delete'" data-id="simple-delete" class="cursor-pointer font-medium block text-sm transform transition-colors duration-200 py-2">
+                                            Simple DELETE
+                                        </span>
+                                    </li>
+                                    <li class="group text-gray-800 hover:text-gray-900">
+                                        <span v-hash="'#delete-query-builder'" data-id="delete-query-builder" class="cursor-pointer font-medium block text-sm transform transition-colors duration-200 py-2">
+                                            DELETE Query Builder
+                                        </span>
+                                    </li>
+                                    <li class="group text-gray-800 hover:text-gray-900">
+                                        <span v-hash="'#delete-expression'" data-id="delete-expression" class="cursor-pointer font-medium block text-sm transform transition-colors duration-200 py-2">
+                                            DELETE Expression
+                                        </span>
+                                    </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
                 
         </div>
     </div>    

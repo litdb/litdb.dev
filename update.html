@@ -235,7 +235,35 @@ Home                                    </span>
                 <div class="not-prose"></div>
 
                 <div class="content">
-                    
+                    <h2 id="simple-update">Simple UPDATE<a class="header-anchor" href="javascript:;" onclick="location.hash='#simple-update'" aria-label="Permalink">&ZeroWidthSpace;</a></h2>
+<p>Simple updates can be executed directly on the litdb driver APIs which will update all properties of a data model:</p>
+<live-preview>
+contact = new Contact({ id:1, name:'John', email:'john@mail.org' })
+db.update(contact)
+</live-preview>
+<h2 id="update-specific-properties">UPDATE Specific Properties<a class="header-anchor" href="javascript:;" onclick="location.hash='#update-specific-properties'" aria-label="Permalink">&ZeroWidthSpace;</a></h2>
+<p>For updating specific properties of a data model, the <code>onlyProps</code> option can be used:</p>
+<live-preview>
+db.update(new Contact({ id:1, email:'john@mail.org' }), { onlyProps:['email'] })
+</live-preview>
+<h2 id="update-query-builder">UPDATE Query Builder<a class="header-anchor" href="javascript:;" onclick="location.hash='#update-query-builder'" aria-label="Permalink">&ZeroWidthSpace;</a></h2>
+<p>When more flexibility is needed you can use <code>$.update()</code> to create an UPDATE query builder:</p>
+<live-preview>
+db.run($.update(Contact).set({ age:41, city:'Austin' }).where($.idEquals(1)))
+const { age, city, email } = { age:41, email:'john@mail.org' }
+const q = $.update(Contact)
+if (age) q.set({ age })
+if (city) q.set({ city })
+if (email) q.set({ email })
+db.run(q.where($.idEquals(1)))
+</live-preview>
+<h2 id="update-expression">UPDATE Expression<a class="header-anchor" href="javascript:;" onclick="location.hash='#update-expression'" aria-label="Permalink">&ZeroWidthSpace;</a></h2>
+<p>When the full flexibility of SQL is needed, you can execute a SQL fragment directly:</p>
+<live-preview>
+const { id, name, age } = { id:1, name:'John', age:27 }
+db.run`UPDATE Contact SET name=${name}, age=${age} WHERE id=${id}`
+</live-preview>
+
                 </div>
 
                 <div class="not-prose"></div>
@@ -271,6 +299,37 @@ Home                                    </span>
                     </div>
             </div>
                 
+                <div class="docmap hidden 2xl:block flex-none w-64 pl-8 mr-8">
+                    <div class="fixed bg-white dark:bg-black flex flex-col overflow-y-auto pt-10 px-8 pb-6" style="height:calc(100vh - 50px);">
+                        <div>
+                            <h5 class="text-slate-900 font-semibold mb-4 text-sm leading-6 dark:text-slate-100">
+                                On This Page
+                            </h5>
+                            <ul class="text-slate-700 text-sm leading-6">
+                                    <li class="group text-gray-800 hover:text-gray-900">
+                                        <span v-hash="'#simple-update'" data-id="simple-update" class="cursor-pointer font-medium block text-sm transform transition-colors duration-200 py-2">
+                                            Simple UPDATE
+                                        </span>
+                                    </li>
+                                    <li class="group text-gray-800 hover:text-gray-900">
+                                        <span v-hash="'#update-specific-properties'" data-id="update-specific-properties" class="cursor-pointer font-medium block text-sm transform transition-colors duration-200 py-2">
+                                            UPDATE Specific Properties
+                                        </span>
+                                    </li>
+                                    <li class="group text-gray-800 hover:text-gray-900">
+                                        <span v-hash="'#update-query-builder'" data-id="update-query-builder" class="cursor-pointer font-medium block text-sm transform transition-colors duration-200 py-2">
+                                            UPDATE Query Builder
+                                        </span>
+                                    </li>
+                                    <li class="group text-gray-800 hover:text-gray-900">
+                                        <span v-hash="'#update-expression'" data-id="update-expression" class="cursor-pointer font-medium block text-sm transform transition-colors duration-200 py-2">
+                                            UPDATE Expression
+                                        </span>
+                                    </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
                 
         </div>
     </div>    

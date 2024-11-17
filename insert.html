@@ -235,17 +235,25 @@ Home                                    </span>
                 <div class="not-prose"></div>
 
                 <div class="content">
-                    <h2 id="simple-insert">Simple Insert<a class="header-anchor" href="javascript:;" onclick="location.hash='#simple-insert'" aria-label="Permalink">&ZeroWidthSpace;</a></h2>
+                    <h2 id="simple-insert">Simple INSERT<a class="header-anchor" href="javascript:;" onclick="location.hash='#simple-insert'" aria-label="Permalink">&ZeroWidthSpace;</a></h2>
+<p>Insert a new entity into a table using the <code>db.insert</code> driver method:</p>
 <live-preview>
 db.insert(new Contact({ name:'John', email:'john@email.com', age:27 }))
-db.insert(new Product({ sku:'W123', name:'Widget', cost:10 }))
+db.insert(new Product({ sku:'WIDGET', name:'Acme Widget', cost:10 }))
 </live-preview>
-<h2 id="insert-multiple-rows">Insert Multiple Rows<a class="header-anchor" href="javascript:;" onclick="location.hash='#insert-multiple-rows'" aria-label="Permalink">&ZeroWidthSpace;</a></h2>
+<h2 id="insert-multiple-rows">INSERT Multiple Rows<a class="header-anchor" href="javascript:;" onclick="location.hash='#insert-multiple-rows'" aria-label="Permalink">&ZeroWidthSpace;</a></h2>
+<p>Insert multiple entities into a table using the <code>db.insertAll</code> driver method:</p>
 <live-preview>
 db.insertAll([
     new Contact({ name:'John', email:'john@email.com', age:27 }),
     new Contact({ name:'Jane', email:'jane@email.com', age:31 })
 ])
+</live-preview>
+<h2 id="insert-expression">INSERT Expression<a class="header-anchor" href="javascript:;" onclick="location.hash='#insert-expression'" aria-label="Permalink">&ZeroWidthSpace;</a></h2>
+<p>When the full flexibility of SQL is needed, you can execute a SQL fragment directly:</p>
+<live-preview>
+const { name, age } = { name:'John', age:27 }
+db.run`INSERT INTO Contact (name,age) VALUES (${name},${age})`
 </live-preview>
 
                 </div>
@@ -292,12 +300,17 @@ db.insertAll([
                             <ul class="text-slate-700 text-sm leading-6">
                                     <li class="group text-gray-800 hover:text-gray-900">
                                         <span v-hash="'#simple-insert'" data-id="simple-insert" class="cursor-pointer font-medium block text-sm transform transition-colors duration-200 py-2">
-                                            Simple Insert
+                                            Simple INSERT
                                         </span>
                                     </li>
                                     <li class="group text-gray-800 hover:text-gray-900">
                                         <span v-hash="'#insert-multiple-rows'" data-id="insert-multiple-rows" class="cursor-pointer font-medium block text-sm transform transition-colors duration-200 py-2">
-                                            Insert Multiple Rows
+                                            INSERT Multiple Rows
+                                        </span>
+                                    </li>
+                                    <li class="group text-gray-800 hover:text-gray-900">
+                                        <span v-hash="'#insert-expression'" data-id="insert-expression" class="cursor-pointer font-medium block text-sm transform transition-colors duration-200 py-2">
+                                            INSERT Expression
                                         </span>
                                     </li>
                             </ul>

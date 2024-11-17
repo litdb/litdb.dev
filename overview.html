@@ -250,7 +250,7 @@ SQL that can be executed on SQLite, MySQL and PostgreSQL.</p>
 JSON.stringify($`id = ${1} OR name = ${'John'}`)
 </live-preview>
 <h3 id="sql-builder">SQL Builder<a class="header-anchor" href="javascript:;" onclick="location.hash='#sql-builder'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
-<p>SQL Builders are just objects containing a <code>build()</code> function which returns a SQL <code>Fragment</code>:</p>
+<p>SQL Builders are just objects containing a <code>build()</code> function which returns an SQL <code>Fragment</code>:</p>
 <pre><code class="language-ts">interface SqlBuilder {
     build(): Fragment
 }
@@ -307,8 +307,10 @@ syntax can be used across different databases and drivers. This preserves invest
 your App's logic to bind to RDBMS-agnostic abstractions that can be reused across different databases or allow your
 App to easily migrate to run on different databases.</p>
 <h2 id="expressive">Expressive<a class="header-anchor" href="javascript:;" onclick="location.hash='#expressive'" aria-label="Permalink">&ZeroWidthSpace;</a></h2>
-<p>At the same time litdb SQL Builders and Fragments doesn't restrict you to a subset of SQL, you can use the full
-expressiveness of your RDBMS SQL to make use of RDBMS-specific features when needed.</p>
+<p>At the same time litdb SQL Builders and Fragments doesn't restrict you to a subset of SQL, instead of forcing the use of
+a more restrictive query language that abstracts away the full power of SQL, litdb's SQL Builders are designed for creating
+type-safe parameterized SQL that can be executed on any RDBMS, but when needed you can use the full expressiveness of
+your RDBMS SQL dialect to make use of RDBMS-specific features.</p>
 
                 </div>
 

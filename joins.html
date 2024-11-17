@@ -298,6 +298,22 @@ $.from(Contact,'c')
     )
     .select('*')
 </live-preview>
+<h2 id="cache-complex-join-queries">Cache complex JOIN queries<a class="header-anchor" href="javascript:;" onclick="location.hash='#cache-complex-join-queries'" aria-label="Permalink">&ZeroWidthSpace;</a></h2>
+<p>For improved performance and to simplify complex queries, complex joins can be reused and memoized by returning isolated
+cloned query builders with <code>clone()</code>.</p>
+<live-preview>
+ const contactOrderItems = (() => {
+    const q = $.from(Contact,'c')
+        .join(Order,     { as:'o', on:(c,o) => $`${c.id} = ${o.contactId}` })
+        .join(OrderItem, { as:'i', on:(o,i) => $`${o.id} = ${i.orderId}` })
+    return () => q.clone()
+})()
+const [q1, q2, q3] = [...Array(3)].map(contactOrderItems)
+const [ c, o, i ] = q1.refs
+db.all(q1.where`${c.id} = ${10}`)
+db.all(q2.where`${o.contactId} = ${20}`)
+db.all(q3.where`${i.orderId} = ${100}`)
+</live-preview>
 
                 </div>
 
@@ -369,6 +385,11 @@ $.from(Contact,'c')
                                     <li class="group text-gray-800 hover:text-gray-900">
                                         <span v-hash="'#join-query-builder'" data-id="join-query-builder" class="cursor-pointer font-medium block text-sm transform transition-colors duration-200 py-2">
                                             JOIN query builder
+                                        </span>
+                                    </li>
+                                    <li class="group text-gray-800 hover:text-gray-900">
+                                        <span v-hash="'#cache-complex-join-queries'" data-id="cache-complex-join-queries" class="cursor-pointer font-medium block text-sm transform transition-colors duration-200 py-2">
+                                            Cache complex JOIN queries
                                         </span>
                                     </li>
                             </ul>
