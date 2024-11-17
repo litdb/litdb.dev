@@ -16,6 +16,10 @@
         "link": "/models"
       },
       {
+        "text": "Customize",
+        "link": "/customize"
+      },
+      {
         "text": "Report Issue",
         "link": "/bug-report"
       }
