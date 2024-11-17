@@ -4,7 +4,7 @@
     <meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="icon" type="image/png" href="/img/favicon.png">
-    <title>litdb for postgres.js</title>
+    <title>GROUP BY Examples</title>
     <script>
     if (location.search === "?dark") localStorage.setItem('color-scheme','dark') 
     if (location.search === "?light") localStorage.removeItem('color-scheme') 
@@ -170,7 +170,7 @@ Home                                    </span>
                                     </a>
                                 </li>
                                 <li class="relative">
-                                    <a href="/postgres" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full active font-semibold text-sky-500 before:bg-sky-500">
+                                    <a href="/postgres" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
                                         PostgreSQL
                                     </a>
                                 </li>
@@ -205,7 +205,7 @@ Home                                    </span>
                                     </a>
                                 </li>
                                 <li class="relative">
-                                    <a href="/group-by" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                    <a href="/group-by" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full active font-semibold text-sky-500 before:bg-sky-500">
                                         Group By
                                     </a>
                                 </li>
@@ -243,130 +243,56 @@ Home                                    </span>
                 
                     <section class="not-prose mb-16 md:mb-12">
                         <h1 class="text-4xl tracking-tight font-extrabold text-gray-900 dark:text-gray-50 sm:text-5xl md:text-6xl">
-                            litdb for postgres.js
+                            GROUP BY Examples
                         </h1>
                     </section>
 
                 <div class="not-prose"></div>
 
                 <div class="content">
-                    <p>Use litdb with <a href="https://github.com/porsager/postgres">postgres.js</a> driver:</p>
-<div class="not-prose sh-copy cp flex cursor-pointer mb-3" onclick="copy(this)">
-                <div class="flex-grow bg-gray-800">
-                    <div class="pl-4 py-1 pb-1.5 align-middle whitespace-pre text-base text-gray-100"><p>npm install @litdb/postgres</p>
-</div>
-                    </div>
-                <div class="flex">
-                    <div class="bg-green-600 text-white p-1.5 pb-0">
-                        <svg class="copied w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
-                        <svg class="nocopy w-6 h-6" title="copy" fill='none' stroke='white' viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg'>
-                            <path stroke-linecap='round' stroke-linejoin='round' stroke-width='1' d='M8 7v8a2 2 0 002 2h6M8 7V5a2 2 0 012-2h4.586a1 1 0 01.707.293l4.414 4.414a1 1 0 01.293.707V15a2 2 0 01-2 2h-2M8 7H6a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2v-2'></path>
-                        </svg>
-                    </div>
-                </div>
-            </div>
-<h2 id="configuration">Configuration<a class="header-anchor" href="javascript:;" onclick="location.hash='#configuration'" aria-label="Permalink">&ZeroWidthSpace;</a></h2>
-<p><strong>db.ts</strong></p>
-<pre><code class="language-ts">import { connect } from &quot;@litdb/postgres&quot;
-
-export const connection = connect({ hostname, database, user, password })
-export const { $, async:db, native:sql } = connection
-</code></pre>
-<div class="tip custom-block">
-            <p class="custom-block-title">TIP</p><p>When needed use <code>sql</code> to access the native <a href="https://github.com/porsager/postgres#usage">postgres.js sql function</a></p>
-</div>
-<h3 id="configuration-options">Configuration Options<a class="header-anchor" href="javascript:;" onclick="location.hash='#configuration-options'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
-<pre><code class="language-ts">type ConnectionOptions = {
-    /** Postgres ip address[s] or domain name[s] */
-    host?: string | undefined;
-    /** Postgres server[s] port[s] */
-    port?: number | undefined;
-    /** unix socket path (usually '/tmp') */
-    path?: string | undefined;
-    /** Password of database user (an alias for `password`) */
-    pass?: Options&lt;T&gt;['password'] | undefined;
-    /**
-     * Password of database user
-     * @default process.env['PGPASSWORD']
-     */
-    password?: string | (() =&gt; string | Promise&lt;string&gt;) | undefined;
-    /** Name of database to connect to (an alias for `database`) */
-    db?: Options&lt;T&gt;['database'] | undefined;
-    /** Username of database user (an alias for `user`) */
-    username?: Options&lt;T&gt;['user'] | undefined;
-    /** Postgres ip address or domain name (an alias for `host`) */
-    hostname?: Options&lt;T&gt;['host'] | undefined;
-    /**
-     * Disable prepared mode
-     * @deprecated use &quot;prepare&quot; option instead
-     */
-    no_prepare?: boolean | undefined;
-    /**
-     * Idle connection timeout in seconds
-     * @deprecated use &quot;idle_timeout&quot; option instead
-     */
-    timeout?: Options&lt;T&gt;['idle_timeout'] | undefined;
-}
-</code></pre>
-<p>See <a href="https://github.com/porsager/postgres?tab=readme-ov-file#connection-details">postgres.js Connection Options</a> for more.</p>
-<p>Example:</p>
-<pre><code class="language-ts">connection = connect({ hostname, database, user, password })
-connection = connect(connectionString, options)
-</code></pre>
-<h2 id="usage">Usage<a class="header-anchor" href="javascript:;" onclick="location.hash='#usage'" aria-label="Permalink">&ZeroWidthSpace;</a></h2>
-<p>Example of using <code>@litdb/postgres</code> async APIs:</p>
-<pre><code class="language-ts">import { $, db } from &quot;./db&quot;
-import { Contact } from &quot;./models&quot;
-
-await db.dropTable(Contact)
-await db.createTable(Contact)
-await db.insertAll([
-    new Contact({ name:&quot;John Doe&quot;, email:&quot;john@mail.org&quot; }),
-    new Contact({ name:&quot;Jane Doe&quot;, email:&quot;jane@mail.org&quot; }),
-])
-
-const janeEmail = 'jane@mail.org'
-const jane = await db.one&lt;Contact&gt;($.from(Contact).where(c =&gt; $`${c.email}=${janeEmail}`))
-
-// Insert examples
-const { lastInsertRowid:bobId } = await db.insert(
-    new Contact({ name:&quot;Bob&quot;, email:&quot;bob@mail.org&quot;}))
-
-const { lastInsertRowid } = await db.exec
-    `INSERT INTO Contact(name,email) VALUES('Jo','jo@doe.org')`
-
-const name = 'Alice', email = 'alice@mail.org'
-await db.exec`INSERT INTO Contact(name,email) VALUES (${name}, ${email})`
-
-// Typed SQL fragment with named param example
-const hasId = &lt;Table extends { id:number }&gt;(id:number|bigint) =&gt;
-    (x:Table) =&gt; $.sql($`${x.id} = $id`, { id })
-
-const contacts = await db.all($.from(Contact).into(Contact))                // =&gt; Contact[]
-const bob = await db.one($.from(Contact).where(hasId(bobId)).into(Contact)) // =&gt; Contact
-const contactsCount = await db.value($.from(Contact).rowCount())            // =&gt; number
-const emails = await db.column($.from(Contact).select(c =&gt; $`${c.email}`))  // =&gt; string[]
-const contactsArray = await db.arrays($.from(Contact))                      // =&gt; any[][]
-const bobArray = await db.array($.from(Contact).where(hasId(bobId)))        // =&gt; any[]
-
-// Update examples
-jane.email = 'jane@doe.org'
-await db.update(jane)                           // Update all properties
-await db.update(jane, { onlyProps:['email'] })  // Update only email
-// query builder
-await db.exec($.update(Contact).set({ email:jane.email }).where(hasId(jane.id)))
-
-// Delete examples
-await db.delete(jane)
-await db.exec($.deleteFrom(Contact).where(hasId(jane.id))) // query builder
-</code></pre>
+                    <h2 id="simple-group-by">Simple GROUP BY<a class="header-anchor" href="javascript:;" onclick="location.hash='#simple-group-by'" aria-label="Permalink">&ZeroWidthSpace;</a></h2>
+<p><code>groupBy</code> works like Query Builder methods where it's called with the query's table references in the order they were added:</p>
+<live-preview>
+$.from(Contact)
+    .join(Order, { on:(c,o) => $`${c.id} = ${o.contactId}` })
+    .groupBy(c => $`${c.name}`)
+    .select((c, o) => $`${c.name}, SUM(${o.total}) AS Total`)
+</live-preview>
+<h2 id="multiple-group-by">Multiple GROUP BY<a class="header-anchor" href="javascript:;" onclick="location.hash='#multiple-group-by'" aria-label="Permalink">&ZeroWidthSpace;</a></h2>
+<p>Multiple group by's can be added in one or multiple <code>groupBy</code> methods:</p>
+<live-preview>
+const q = $.from(Contact,'c')
+    .join(Order, { on:(c,o) => $`${c.id} = ${o.contactId}` })
+    .select((c, o) => $`${c.name}, ${c.city}, SUM(${o.total})`)
+db.all(q.clone().groupBy(c => $`${c.name}, ${c.city}`))
+db.all(q.clone().groupBy(c => $`${c.name}`).groupBy(c => $`${c.city}`))
+</live-preview>
+<h2 id="group-by-builder">GROUP BY Builder<a class="header-anchor" href="javascript:;" onclick="location.hash='#group-by-builder'" aria-label="Permalink">&ZeroWidthSpace;</a></h2>
+<p>When more flexibility is needed, <code>$.groupBy</code> can be used to create a HAVING builder which can be constructed independently
+of the query:</p>
+<live-preview>
+$.from(Contact,'c')
+    .join(Order, { as:'o', on:(c,o) => $`${c.id} = ${o.contactId}` })
+    .join(OrderItem, { as:'i', on:(o,i) => $`${o.id} = ${i.orderId}` })
+    .groupBy(
+        $.groupBy(Contact,OrderItem)
+            .add(c => $`${c.name}`)
+            .add((_,i) => $`${i.sku}`)
+    )
+    .select((c,o,i) => $`${c.name}, ${i.sku}, SUM(${o.total}) AS total`)
+</live-preview>
+<h2 id="reset-group-by">Reset GROUP BY<a class="header-anchor" href="javascript:;" onclick="location.hash='#reset-group-by'" aria-label="Permalink">&ZeroWidthSpace;</a></h2>
+<p>Calling <code>groupBy</code> with no arguments will reset the GROUP BY clause:</p>
+<live-preview>
+$.from(Contact).groupBy`name`.groupBy().select`name`
+</live-preview>
 
                 </div>
 
                 <div class="not-prose"></div>
                 
                     <div class="not-prose py-8">
-                        <a class="text-slate-500 font-semibold hover:text-indigo-600 flex items-center" href="https://github.com/litdb/litdb.dev/blob/main/MyApp/_pages/postgres.md" target="_blank" rel="noopener noreferrer">
+                        <a class="text-slate-500 font-semibold hover:text-indigo-600 flex items-center" href="https://github.com/litdb/litdb.dev/blob/main/MyApp/_pages/group-by.md" target="_blank" rel="noopener noreferrer">
                             Edit this page on GitHub<svg class="ml-1 inline-block w-4 h-4" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" data-v-1ed99556=""><path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"></path><polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"></polygon></svg>
                         </a>
                     </div>
@@ -374,18 +300,18 @@ await db.exec($.deleteFrom(Contact).where(hasId(jane.id))) // query builder
                     <div class="not-prose my-20">
                                 <nav class="flex items-center justify-between border-t border-gray-200 dark:border-gray-700 px-4 sm:px-0">
                                     <div class="-mt-px flex w-0 flex-1">
-                                            <a href="/better-sqlite" class="inline-flex items-center border-t-2 border-transparent pt-4 pr-1 text-sm font-medium text-gray-500 hover:border-gray-300 dark:hover:border-gray-600 hover:text-gray-700 dark:hover:text-gray-200">
+                                            <a href="/where" class="inline-flex items-center border-t-2 border-transparent pt-4 pr-1 text-sm font-medium text-gray-500 hover:border-gray-300 dark:hover:border-gray-600 hover:text-gray-700 dark:hover:text-gray-200">
                                                 <!-- Heroicon name: mini/arrow-long-left -->
                                                 <svg class="mr-3 h-5 w-5 text-gray-500" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
                                                     <path fill-rule="evenodd" d="M18 10a.75.75 0 01-.75.75H4.66l2.1 1.95a.75.75 0 11-1.02 1.1l-3.5-3.25a.75.75 0 010-1.1l3.5-3.25a.75.75 0 111.02 1.1l-2.1 1.95h12.59A.75.75 0 0118 10z" clip-rule="evenodd"></path>
                                                 </svg>
-                                                SQLite (Node.js)
+                                                Where
                                             </a>
                                     </div>
                                     <div class="hidden md:-mt-px md:flex"></div>
                                     <div class="-mt-px flex w-0 flex-1 justify-end">
-                                            <a href="/mysql2" class="inline-flex items-center border-t-2 border-transparent pt-4 pl-1 text-sm font-medium text-gray-500 hover:border-gray-300 dark:hover:border-gray-600 hover:text-gray-700 dark:hover:text-gray-200">
-                                                MySQL
+                                            <a href="/having" class="inline-flex items-center border-t-2 border-transparent pt-4 pl-1 text-sm font-medium text-gray-500 hover:border-gray-300 dark:hover:border-gray-600 hover:text-gray-700 dark:hover:text-gray-200">
+                                                Having
                                                 <!-- Heroicon name: mini/arrow-long-right -->
                                                 <svg class="ml-3 h-5 w-5 text-gray-500" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
                                                     <path fill-rule="evenodd" d="M2 10a.75.75 0 01.75-.75h12.59l-2.1-1.95a.75.75 0 111.02-1.1l3.5 3.25a.75.75 0 010 1.1l-3.5 3.25a.75.75 0 11-1.02-1.1l2.1-1.95H2.75A.75.75 0 012 10z" clip-rule="evenodd"></path>
@@ -404,21 +330,23 @@ await db.exec($.deleteFrom(Contact).where(hasId(jane.id))) // query builder
                             </h5>
                             <ul class="text-slate-700 text-sm leading-6">
                                     <li class="group text-gray-800 hover:text-gray-900">
-                                        <span v-hash="'#configuration'" data-id="configuration" class="cursor-pointer font-medium block text-sm transform transition-colors duration-200 py-2">
-                                            Configuration
+                                        <span v-hash="'#simple-group-by'" data-id="simple-group-by" class="cursor-pointer font-medium block text-sm transform transition-colors duration-200 py-2">
+                                            Simple GROUP BY
                                         </span>
-                                            <ul class="ml-4">
-                                                    <li data-id="configuration-options" class="text-gray-500 hover:text-gray-900">
-                                                        <span v-hash="'#configuration-options'" class="cursor-pointer flex text-sm transform transition-colors duration-200 py-2">
-                                                            <svg width="3" height="24" viewBox="0 -9 3 24" class="mr-2 overflow-visible"><path d="M0 0L3 3L0 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path></svg>
-                                                            Configuration Options
-                                                        </span>
-                                                    </li>
-                                            </ul>
                                     </li>
                                     <li class="group text-gray-800 hover:text-gray-900">
-                                        <span v-hash="'#usage'" data-id="usage" class="cursor-pointer font-medium block text-sm transform transition-colors duration-200 py-2">
-                                            Usage
+                                        <span v-hash="'#multiple-group-by'" data-id="multiple-group-by" class="cursor-pointer font-medium block text-sm transform transition-colors duration-200 py-2">
+                                            Multiple GROUP BY
+                                        </span>
+                                    </li>
+                                    <li class="group text-gray-800 hover:text-gray-900">
+                                        <span v-hash="'#group-by-builder'" data-id="group-by-builder" class="cursor-pointer font-medium block text-sm transform transition-colors duration-200 py-2">
+                                            GROUP BY Builder
+                                        </span>
+                                    </li>
+                                    <li class="group text-gray-800 hover:text-gray-900">
+                                        <span v-hash="'#reset-group-by'" data-id="reset-group-by" class="cursor-pointer font-medium block text-sm transform transition-colors duration-200 py-2">
+                                            Reset GROUP BY
                                         </span>
                                     </li>
                             </ul>
