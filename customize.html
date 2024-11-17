@@ -4,7 +4,7 @@
     <meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="icon" type="image/png" href="/img/favicon.png">
-    <title>DELETE Examples</title>
+    <title>Customize</title>
     <script>
     if (location.search === "?dark") localStorage.setItem('color-scheme','dark') 
     if (location.search === "?light") localStorage.removeItem('color-scheme') 
@@ -150,7 +150,7 @@ Home                                    </span>
                                     </a>
                                 </li>
                                 <li class="relative">
-                                    <a href="/customize" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                    <a href="/customize" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full active font-semibold text-sky-500 before:bg-sky-500">
                                         Customize
                                     </a>
                                 </li>
@@ -235,7 +235,7 @@ Home                                    </span>
                                     </a>
                                 </li>
                                 <li class="relative">
-                                    <a href="/delete" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full active font-semibold text-sky-500 before:bg-sky-500">
+                                    <a href="/delete" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
                                         Delete
                                     </a>
                                 </li>
@@ -248,37 +248,70 @@ Home                                    </span>
                 
                     <section class="not-prose mb-16 md:mb-12">
                         <h1 class="text-4xl tracking-tight font-extrabold text-gray-900 dark:text-gray-50 sm:text-5xl md:text-6xl">
-                            DELETE Examples
+                            Customize
                         </h1>
                     </section>
 
                 <div class="not-prose"></div>
 
                 <div class="content">
-                    <h2 id="simple-delete">Simple DELETE<a class="header-anchor" href="javascript:;" onclick="location.hash='#simple-delete'" aria-label="Permalink">&ZeroWidthSpace;</a></h2>
-<p>Delete an entity using the <code>db.delete</code> driver method:</p>
-<live-preview>
-db.delete(new Contact({ name:'John', email:'john@email.com', age:27 }))
-</live-preview>
-<h2 id="delete-query-builder">DELETE Query Builder<a class="header-anchor" href="javascript:;" onclick="location.hash='#delete-query-builder'" aria-label="Permalink">&ZeroWidthSpace;</a></h2>
-<p>When a custom query is needed you can use <code>$.deleteFrom()</code> to create a DELETE query builder:</p>
-<live-preview>
-const yearAgo = new Date(new Date().setFullYear(new Date().getFullYear() - 1))
-db.run($.deleteFrom(Order).where(c => $`${c.createdAt} < ${yearAgo}`))
-</live-preview>
-<h2 id="delete-expression">DELETE Expression<a class="header-anchor" href="javascript:;" onclick="location.hash='#delete-expression'" aria-label="Permalink">&ZeroWidthSpace;</a></h2>
-<p>When the full flexibility of SQL is needed, you can execute a SQL fragment directly:</p>
-<live-preview>
-const name = 'John'
-db.run`DELETE FROM Contact WHERE name = ${name}`
-</live-preview>
+                    <h2 id="custom-naming-strategy">Custom Naming Strategy<a class="header-anchor" href="javascript:;" onclick="location.hash='#custom-naming-strategy'" aria-label="Permalink">&ZeroWidthSpace;</a></h2>
+<p>App's can configure litdb to use a custom naming strategy for tables and columns by configuring the dialect's strategy.</p>
+<pre><code class="language-ts">import { SnakeCaseStrategy } from &quot;litdb&quot;
+import { connect } from &quot;@litdb/postgres&quot;
+
+export const connection = connect({hostname, database, user, password})
+export const { $, async: db, native:sql } = connection
+connection.dialect.strategy = new SnakeCaseStrategy()
+</code></pre>
+<p>Where SnakeCaseStrategy is defined as returning table and column names in snake_case:</p>
+<pre><code class="language-ts">class SnakeCaseStrategy {
+    tableName(table:string) : string { return snakeCase(table) }
+    columnName(column:string) : string { return snakeCase(column) }
+}
+</code></pre>
+<h2 id="type-converters">Type Converters<a class="header-anchor" href="javascript:;" onclick="location.hash='#type-converters'" aria-label="Permalink">&ZeroWidthSpace;</a></h2>
+<p>litdb uses type converters to convert between JavaScript Objects and RDBMS data types. App's can configure litdb to use
+custom type converters by registering them with the driver's schema.</p>
+<p>A Type Convert is an object with <code>toDb</code> and <code>fromDb</code> functions that convert between JavaScript and RDBMS data types.</p>
+<pre><code class="language-ts">interface TypeConverter {
+    toDb(value: any): any;
+    fromDb(value: any): any;
+}
+</code></pre>
+<p>For example, this <code>DateConverter</code> is used to convert <code>Date</code> objects to and from MySQL's <code>DATETIME</code> format:</p>
+<pre><code class="language-ts">class DateConverter implements TypeConverter
+{
+    toDb(value: any) {
+        const d = toDate(value)
+        return d ? dateISOString(d).replace('T',' ') : null
+    }
+    fromDb(value: any) {
+        if (!value) return null
+        return toDate(value)
+    }
+}
+</code></pre>
+<p>Custom Type Converters can be registered with the driver's schema on the data type that they convert:</p>
+<pre><code class="language-ts">export const connection = connect({ host, database, user, password })
+export const { $, async:db, native } = connection
+
+connection.schema.converters['DATETIME'] = new DateTimeConverter()
+</code></pre>
+<h2 id="register-converter-for-mutliple-data-types">Register Converter for Mutliple Data Types<a class="header-anchor" href="javascript:;" onclick="location.hash='#register-converter-for-mutliple-data-types'" aria-label="Permalink">&ZeroWidthSpace;</a></h2>
+<p>The <code>converterFor</code> utility function can be used to register a converter for multiple data types:</p>
+<pre><code class="language-ts">import { converterFor } from &quot;litdb&quot;
+
+Object.assign(connection.schema.converters, 
+    converterFor(new DateConverter(), &quot;DATE&quot;, &quot;DATETIME&quot;, &quot;TIMESTAMP&quot;, &quot;TIMESTAMPZ&quot;))
+</code></pre>
 
                 </div>
 
                 <div class="not-prose"></div>
                 
                     <div class="not-prose py-8">
-                        <a class="text-slate-500 font-semibold hover:text-indigo-600 flex items-center" href="https://github.com/litdb/litdb.dev/blob/main/MyApp/_pages/delete.md" target="_blank" rel="noopener noreferrer">
+                        <a class="text-slate-500 font-semibold hover:text-indigo-600 flex items-center" href="https://github.com/litdb/litdb.dev/blob/main/MyApp/_pages/customize.md" target="_blank" rel="noopener noreferrer">
                             Edit this page on GitHub<svg class="ml-1 inline-block w-4 h-4" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" data-v-1ed99556=""><path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"></path><polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"></polygon></svg>
                         </a>
                     </div>
@@ -286,16 +319,23 @@ db.run`DELETE FROM Contact WHERE name = ${name}`
                     <div class="not-prose my-20">
                                 <nav class="flex items-center justify-between border-t border-gray-200 dark:border-gray-700 px-4 sm:px-0">
                                     <div class="-mt-px flex w-0 flex-1">
-                                            <a href="/update" class="inline-flex items-center border-t-2 border-transparent pt-4 pr-1 text-sm font-medium text-gray-500 hover:border-gray-300 dark:hover:border-gray-600 hover:text-gray-700 dark:hover:text-gray-200">
+                                            <a href="/models" class="inline-flex items-center border-t-2 border-transparent pt-4 pr-1 text-sm font-medium text-gray-500 hover:border-gray-300 dark:hover:border-gray-600 hover:text-gray-700 dark:hover:text-gray-200">
                                                 <!-- Heroicon name: mini/arrow-long-left -->
                                                 <svg class="mr-3 h-5 w-5 text-gray-500" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
                                                     <path fill-rule="evenodd" d="M18 10a.75.75 0 01-.75.75H4.66l2.1 1.95a.75.75 0 11-1.02 1.1l-3.5-3.25a.75.75 0 010-1.1l3.5-3.25a.75.75 0 111.02 1.1l-2.1 1.95h12.59A.75.75 0 0118 10z" clip-rule="evenodd"></path>
                                                 </svg>
-                                                Update
+                                                Models
                                             </a>
                                     </div>
                                     <div class="hidden md:-mt-px md:flex"></div>
                                     <div class="-mt-px flex w-0 flex-1 justify-end">
+                                            <a href="/bug-report" class="inline-flex items-center border-t-2 border-transparent pt-4 pl-1 text-sm font-medium text-gray-500 hover:border-gray-300 dark:hover:border-gray-600 hover:text-gray-700 dark:hover:text-gray-200">
+                                                Report Issue
+                                                <!-- Heroicon name: mini/arrow-long-right -->
+                                                <svg class="ml-3 h-5 w-5 text-gray-500" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                                                    <path fill-rule="evenodd" d="M2 10a.75.75 0 01.75-.75h12.59l-2.1-1.95a.75.75 0 111.02-1.1l3.5 3.25a.75.75 0 010 1.1l-3.5 3.25a.75.75 0 11-1.02-1.1l2.1-1.95H2.75A.75.75 0 012 10z" clip-rule="evenodd"></path>
+                                                </svg>
+                                            </a>
                                     </div>
                                 </nav>
                     </div>
@@ -309,18 +349,18 @@ db.run`DELETE FROM Contact WHERE name = ${name}`
                             </h5>
                             <ul class="text-slate-700 text-sm leading-6">
                                     <li class="group text-gray-800 hover:text-gray-900">
-                                        <span v-hash="'#simple-delete'" data-id="simple-delete" class="cursor-pointer font-medium block text-sm transform transition-colors duration-200 py-2">
-                                            Simple DELETE
+                                        <span v-hash="'#custom-naming-strategy'" data-id="custom-naming-strategy" class="cursor-pointer font-medium block text-sm transform transition-colors duration-200 py-2">
+                                            Custom Naming Strategy
                                         </span>
                                     </li>
                                     <li class="group text-gray-800 hover:text-gray-900">
-                                        <span v-hash="'#delete-query-builder'" data-id="delete-query-builder" class="cursor-pointer font-medium block text-sm transform transition-colors duration-200 py-2">
-                                            DELETE Query Builder
+                                        <span v-hash="'#type-converters'" data-id="type-converters" class="cursor-pointer font-medium block text-sm transform transition-colors duration-200 py-2">
+                                            Type Converters
                                         </span>
                                     </li>
                                     <li class="group text-gray-800 hover:text-gray-900">
-                                        <span v-hash="'#delete-expression'" data-id="delete-expression" class="cursor-pointer font-medium block text-sm transform transition-colors duration-200 py-2">
-                                            DELETE Expression
+                                        <span v-hash="'#register-converter-for-mutliple-data-types'" data-id="register-converter-for-mutliple-data-types" class="cursor-pointer font-medium block text-sm transform transition-colors duration-200 py-2">
+                                            Register Converter for Mutliple Data Types
                                         </span>
                                     </li>
                             </ul>
