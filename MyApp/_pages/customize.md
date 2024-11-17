@@ -38,7 +38,7 @@ interface TypeConverter {
 }
 ```
 
-For example, this `DateConverter` is used to convert `Date` objects to and from MySQL's `DATETIME` format:
+For example, this `DateConverter` is used to convert `Date` objects to and from MySQL's `DATETIME` data type:
 
 ```ts
 class DateConverter implements TypeConverter
