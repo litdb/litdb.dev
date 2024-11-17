@@ -87,3 +87,11 @@ $.from(Contact).where({
     notNull: ['email'], 
 })
 </live-preview>
+
+## Reset WHERE
+
+Calling `where` with no arguments will reset the WHERE clause:
+
+<live-preview>
+$.from(Contact).where`name LIKE ${'John%'}`.where()
+</live-preview>
