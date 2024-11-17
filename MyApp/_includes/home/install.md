@@ -23,7 +23,7 @@ are also available for the popular databases:
 
 ### Bun SQLite
 
-Use with [Bun's native SQLite3 driver](https://bun.sh/docs/api/sqlite):
+Use with [Bun's native SQLite3 driver](https://bun.sh/docs/api/sqlite) (requires Bun):
 
 :::sh
 bun install @litdb/bun-sqlite
@@ -33,7 +33,7 @@ See [litdb Bun SQLite Docs](/bun-sqlite)
 
 ### Node better-sqlite
 
-Use with Node [better-sqlite3](https://github.com/WiseLibs/better-sqlite3):
+Use with [better-sqlite3](https://github.com/WiseLibs/better-sqlite3) (requires Node.js):
 
 :::sh
 npm install @litdb/better-sqlite
@@ -68,12 +68,13 @@ If you'd like to see a driver for a specific client, please open or vote for a f
 
 ## Driver Usage
 
-litdb drivers are lightweight data adapters providing a number of convenience APIs for executing SQL and parameters. 
-They can be used with our without litdb SQL Builders, but offer the most value when used together. 
+The litdb Drivers provide a unified interface for executing custom parameterized SQL, SQL Builders and SQL Fragments 
+for their respective RDBMS. They're lightweight data adapters providing convenience APIs for executing SQL with named 
+and positional parameters. They can be used without litdb SQL Builders, but offer the most value when used together. 
 
 The same APIs are available across all drivers, so you can easily switch between them. They include both **sync** APIs
 recommended for SQLite libraries that use SQLite's native blocking APIs, whilst **async** APIs should be used for 
-all other databases, e.g. PostgreSQL and MySQL.
+all other remote databases, e.g. PostgreSQL and MySQL.
 
 Example of using the [Bun SQLite](https://bun.sh/docs/api/sqlite) driver:
 
@@ -136,3 +137,4 @@ db.exec($.deleteFrom(Contact).where(hasId(jane.id))) // query builder
 
 Same source is compatible with other sync drivers, e.g. can replace `@litdb/bun-sqlite` with `@litdb/better-sqlite` to use
 with [better-sqlite](/better-sqlite#usage). See also async usage docs for [postgres](/postgres#usage) and [mysql2](/mysql2#usage). 
+

@@ -28,6 +28,9 @@ that's added containing references for all tables in the query in the order they
 
 These references can be used in `where`, `select`, `groupBy`, `orderBy` methods to reference columns from each table.
 
+The `*join` APIs are instead passed a reference to the **previous** joined table and the **current** table, they also include
+a reference to the **primary** table as the last reference (e.g. OrderItem `on:(_,i,o)`).
+
 <live-preview>
 $.from(Order)
   .leftJoin(Contact, { on:(o,c) => $`${o.contactId} = ${c.id}` })

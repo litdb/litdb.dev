@@ -67,6 +67,8 @@ interface SyncDbConnection {
     prepareSync<T>(str: TemplateStringsArray | SqlBuilder | Fragment, ...params: any[]): Statement    
     close()
 }
+
+type Changes = { changes: number; lastInsertRowid: number | bigint }
 ```
 
 ## Data Models
@@ -76,21 +78,23 @@ litdb is more a lightweight data mapper than a full-fledged ORM, but many of its
 
 ## Safe by default
 
-All SQL Queries and SQL Fragments require using a tagged template function to prevent SQL Injection attacks, e.g:
+All SQL Queries and SQL Fragments require using a tagged template function which parameterizes all values to prevent 
+SQL Injection attacks, accidentally using a `string` will result in an error, e.g:
 
 <live-preview>
 const bobbyTables = "Robert'); DROP TABLE Students;--"
-db.one(`SELECT * FROM Contact WHERE name = ${bobbyTables}`)
+db.one(`SELECT * FROM Contact WHERE name = '${bobbyTables}'`)
 </live-preview>
 
 Driver APIs, SQL Builders and Expressions instead accept templated strings which auto parameterizes SQL queries:
 
 <live-preview>
 const bobbyTables = "Robert'); DROP TABLE Students;--"
+db.one($.from(Contact).where`name = ${bobbyTables}`)
 db.one`SELECT * FROM Contact WHERE name = ${bobbyTables}`
 db.one($`SELECT * FROM Contact WHERE name = ${bobbyTables}`)
-db.one($.from(Contact).where`name = ${bobbyTables}`)
-db.one($.sql(`SELECT * FROM Contact WHERE name = $bobbyTables`, { bobbyTables }))
+db.one($.sql('SELECT * FROM Contact WHERE name = $bobbyTables', { bobbyTables }))
+db.one({ sql:'SELECT * FROM Contact WHERE name=$bobbyTables',params:{bobbyTables} })
 </live-preview>
 
 ## Portable
