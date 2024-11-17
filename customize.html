@@ -279,7 +279,7 @@ custom type converters by registering them with the driver's schema.</p>
     fromDb(value: any): any;
 }
 </code></pre>
-<p>For example, this <code>DateConverter</code> is used to convert <code>Date</code> objects to and from MySQL's <code>DATETIME</code> format:</p>
+<p>For example, this <code>DateConverter</code> is used to convert <code>Date</code> objects to and from MySQL's <code>DATETIME</code> data type:</p>
 <pre><code class="language-ts">class DateConverter implements TypeConverter
 {
     toDb(value: any) {
