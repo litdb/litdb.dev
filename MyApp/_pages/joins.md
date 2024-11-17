@@ -83,3 +83,22 @@ $.from(Contact,'c')
     )
     .select('*')
 </live-preview>
+
+## Cache complex JOIN queries
+
+For improved performance and to simplify complex queries, complex joins can be reused and memoized by returning isolated
+cloned query builders with `clone()`.
+
+<live-preview>
+ const contactOrderItems = (() => {
+    const q = $.from(Contact,'c')
+        .join(Order,     { as:'o', on:(c,o) => $`${c.id} = ${o.contactId}` })
+        .join(OrderItem, { as:'i', on:(o,i) => $`${o.id} = ${i.orderId}` })
+    return () => q.clone()
+})()
+const [q1, q2, q3] = [...Array(3)].map(contactOrderItems)
+const [ c, o, i ] = q1.refs
+db.all(q1.where`${c.id} = ${10}`)
+db.all(q2.where`${o.contactId} = ${20}`)
+db.all(q3.where`${i.orderId} = ${100}`)
+</live-preview>

@@ -4,7 +4,7 @@ const qHot = $.from(OrderItem)
     .groupBy(i => $`${i.id}`)
     .orderBy(i => $`SUM(${i.qty}) DESC`)
     .select(i => $`${i.id}`)
-    .limit(10,20)
+    .limit(10)
 
 const contactIds = [1,2,3]
 const q = $.from(Order, 'o')

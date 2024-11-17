@@ -25,19 +25,24 @@ $.from(Contact).where`id IN (${[10,20,30]})`
 
 ## WHERE with Subqueries
 
-Fragments can embed other fragments where their SQL and parameters are merged, this can be used to create 
-subqueries that can be used in WHERE conditions.
+Fragments can embed other fragments where their SQL and parameters are merged.
 
 <live-preview>
-$.from(Contact)
-    .where(c => $`${c.id} = ${10}`)
-    .and`EXISTS (${$.from(Contact).where(c => $`${c.id} = ${10})`).select`1`})`
-    .and(c => $`${c.name} = ${'John'}`)
+const hasPurchasesOver = (c,total) => $`EXISTS (
+       SELECT 1 FROM Order WHERE o.contactId = ${c.id} AND total >= ${total})`
+const inCity = (...cities) => c => $`${c.city} IN (${cities})`
+const olderThan = age => $.sql('age >= $age', { age })
+const q = $.from(Contact,'c')
+    .where(c => hasPurchasesOver(c,1000))
+    .and(inCity('Austin','Chicago'))
+    .and(olderThan(18))
+    .and({ contains: { name:'John' } })
+db.all(q)
 </live-preview>
 
 ### Subqueries with Query Builders
 
-Similarly, Query Builders can be embedded in other Query Builders to create subqueries that can be used in WHERE conditions.
+Similarly, Query Builders and SQL Fragments can be embedded in other Query Builders to create complex subqueries.
 
 <live-preview src="/mjs/subselect.mjs"></live-preview>
 

@@ -27,7 +27,7 @@ JSON.stringify($`id = ${1} OR name = ${'John'}`)
 
 ### SQL Builder
 
-SQL Builders are just objects containing a `build()` function which returns a SQL `Fragment`:
+SQL Builders are just objects containing a `build()` function which returns an SQL `Fragment`:
 
 ```ts
 interface SqlBuilder {
@@ -102,5 +102,7 @@ App to easily migrate to run on different databases.
 
 ## Expressive
 
-At the same time litdb SQL Builders and Fragments doesn't restrict you to a subset of SQL, you can use the full 
-expressiveness of your RDBMS SQL to make use of RDBMS-specific features when needed.
+At the same time litdb SQL Builders and Fragments doesn't restrict you to a subset of SQL, instead of forcing the use of
+a more restrictive query language that abstracts away the full power of SQL, litdb's SQL Builders are designed for creating
+type-safe parameterized SQL that can be executed on any RDBMS, but when needed you can use the full expressiveness of 
+your RDBMS SQL dialect to make use of RDBMS-specific features.
