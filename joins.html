@@ -252,6 +252,8 @@ db.all($.from(Contact).crossJoin(Order, { on:(c,o) => $`${c.id} = ${o.contactId}
 <p>Multiple joins can be chained together to create complex queries. A new query builder is created for each join
 that's added containing references for all tables in the query in the order they were added.</p>
 <p>These references can be used in <code>where</code>, <code>select</code>, <code>groupBy</code>, <code>orderBy</code> methods to reference columns from each table.</p>
+<p>The <code>*join</code> APIs are instead passed a reference to the <strong>previous</strong> joined table and the <strong>current</strong> table, they also include
+a reference to the <strong>primary</strong> table as the last reference (e.g. OrderItem <code>on:(_,i,o)</code>).</p>
 <live-preview>
 $.from(Order)
   .leftJoin(Contact, { on:(o,c) => $`${o.contactId} = ${c.id}` })

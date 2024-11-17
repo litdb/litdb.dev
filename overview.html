@@ -283,23 +283,27 @@ remote databases like PostgreSQL and MySQL only support the Async DbConnection.<
     prepareSync&lt;T&gt;(str: TemplateStringsArray | SqlBuilder | Fragment, ...params: any[]): Statement    
     close()
 }
+
+type Changes = { changes: number; lastInsertRowid: number | bigint }
 </code></pre>
 <h2 id="data-models">Data Models<a class="header-anchor" href="javascript:;" onclick="location.hash='#data-models'" aria-label="Permalink">&ZeroWidthSpace;</a></h2>
 <p>litdb is more a lightweight data mapper than a full-fledged ORM, but many of its APIs are designed to work with
 <a href="/models">data models</a> which are simple TypeScript classes that represent and map 1:1 to tables in a database.</p>
 <h2 id="safe-by-default">Safe by default<a class="header-anchor" href="javascript:;" onclick="location.hash='#safe-by-default'" aria-label="Permalink">&ZeroWidthSpace;</a></h2>
-<p>All SQL Queries and SQL Fragments require using a tagged template function to prevent SQL Injection attacks, e.g:</p>
+<p>All SQL Queries and SQL Fragments require using a tagged template function which parameterizes all values to prevent
+SQL Injection attacks, accidentally using a <code>string</code> will result in an error, e.g:</p>
 <live-preview>
 const bobbyTables = "Robert'); DROP TABLE Students;--"
-db.one(`SELECT * FROM Contact WHERE name = ${bobbyTables}`)
+db.one(`SELECT * FROM Contact WHERE name = '${bobbyTables}'`)
 </live-preview>
 <p>Driver APIs, SQL Builders and Expressions instead accept templated strings which auto parameterizes SQL queries:</p>
 <live-preview>
 const bobbyTables = "Robert'); DROP TABLE Students;--"
+db.one($.from(Contact).where`name = ${bobbyTables}`)
 db.one`SELECT * FROM Contact WHERE name = ${bobbyTables}`
 db.one($`SELECT * FROM Contact WHERE name = ${bobbyTables}`)
-db.one($.from(Contact).where`name = ${bobbyTables}`)
-db.one($.sql(`SELECT * FROM Contact WHERE name = $bobbyTables`, { bobbyTables }))
+db.one($.sql('SELECT * FROM Contact WHERE name = $bobbyTables', { bobbyTables }))
+db.one({ sql:'SELECT * FROM Contact WHERE name=$bobbyTables',params:{bobbyTables} })
 </live-preview>
 <h2 id="portable">Portable<a class="header-anchor" href="javascript:;" onclick="location.hash='#portable'" aria-label="Permalink">&ZeroWidthSpace;</a></h2>
 <p>litdb is designed to be portable where in most cases query builders, expressions and driver APIs that stick to ANSI SQL
