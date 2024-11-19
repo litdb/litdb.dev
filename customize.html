@@ -273,14 +273,14 @@ connection.dialect.strategy = new SnakeCaseStrategy()
 <h2 id="type-converters">Type Converters<a class="header-anchor" href="javascript:;" onclick="location.hash='#type-converters'" aria-label="Permalink">&ZeroWidthSpace;</a></h2>
 <p>litdb uses type converters to convert between JavaScript Objects and RDBMS data types. App's can configure litdb to use
 custom type converters by registering them with the driver's schema.</p>
-<p>A Type Convert is an object with <code>toDb</code> and <code>fromDb</code> functions that convert between JavaScript and RDBMS data types.</p>
+<p>A Type Converter is an object with <code>toDb</code> and <code>fromDb</code> methods that convert between JavaScript and RDBMS data types.</p>
 <pre><code class="language-ts">interface TypeConverter {
     toDb(value: any): any;
     fromDb(value: any): any;
 }
 </code></pre>
-<p>For example, this <code>DateConverter</code> is used to convert <code>Date</code> objects to and from MySQL's <code>DATETIME</code> data type:</p>
-<pre><code class="language-ts">class DateConverter implements TypeConverter
+<p>For example, this <code>DateTimeConverter</code> is used to convert <code>Date</code> objects to and from MySQL's <code>DATETIME</code> data type:</p>
+<pre><code class="language-ts">class DateTimeConverter implements TypeConverter
 {
     toDb(value: any) {
         const d = toDate(value)
@@ -292,7 +292,7 @@ custom type converters by registering them with the driver's schema.</p>
     }
 }
 </code></pre>
-<p>Custom Type Converters can be registered with the driver's schema on the data type that they convert:</p>
+<p>Custom Type Converters can be registered with the driver's schema for the data type it should apply to:</p>
 <pre><code class="language-ts">export const connection = connect({ host, database, user, password })
 export const { $, async:db, native } = connection
 
