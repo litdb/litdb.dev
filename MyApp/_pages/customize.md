@@ -29,7 +29,7 @@ class SnakeCaseStrategy {
 litdb uses type converters to convert between JavaScript Objects and RDBMS data types. App's can configure litdb to use 
 custom type converters by registering them with the driver's schema.
 
-A Type Convert is an object with `toDb` and `fromDb` functions that convert between JavaScript and RDBMS data types.
+A Type Converter is an object with `toDb` and `fromDb` methods that convert between JavaScript and RDBMS data types.
 
 ```ts
 interface TypeConverter {
@@ -38,10 +38,10 @@ interface TypeConverter {
 }
 ```
 
-For example, this `DateConverter` is used to convert `Date` objects to and from MySQL's `DATETIME` data type:
+For example, this `DateTimeConverter` is used to convert `Date` objects to and from MySQL's `DATETIME` data type:
 
 ```ts
-class DateConverter implements TypeConverter
+class DateTimeConverter implements TypeConverter
 {
     toDb(value: any) {
         const d = toDate(value)
@@ -54,7 +54,7 @@ class DateConverter implements TypeConverter
 }
 ```
 
-Custom Type Converters can be registered with the driver's schema on the data type that they convert:
+Custom Type Converters can be registered with the driver's schema for the data type it should apply to:
 
 ```ts
 export const connection = connect({ host, database, user, password })
