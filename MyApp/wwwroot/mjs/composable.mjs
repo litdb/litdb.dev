@@ -23,7 +23,7 @@ const totalOrders = $`SELECT SUM(${o4.total})
 
 // Compose queries from multiple query builders and SQL fragments
 const q = $.from(c)
-    .join(o, { on:(c,o) => $`${c.id} = ${o.contactId}`})
+    .join(o, $`${c.id} = ${o.contactId}`)
     .where`${o.createdAt} = (${recentOrder})`
     .select`
         ${c.id}, 

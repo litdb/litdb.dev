@@ -65,9 +65,9 @@ const recentOrder = $.from(Order,'o2')
   .where(o2 => $`${o2.contactId} = ${c.id}`)
   .select(o2 => $`MAX(${o2.createdAt})`)
 db.all($.from(o)
-  .leftJoin(c, { on:(o,c) => $`${o.contactId} = ${c.id}`, as:'c' })
-  .join(i, { on:(_,i,o) => $`${i.orderId} = ${o.id}`, as:'i' })
-  .leftJoin(p, { on:(i,p) => $`${i.sku} = ${p.sku}`, as:'p' })
+  .leftJoin(c, $`${o.contactId} = ${c.id}`)
+  .join(i, $`${i.orderId} = ${o.id}`)
+  .leftJoin(p, $`${i.sku} = ${p.sku}`)
   .where`${o.createdAt} = (${recentOrder})`
   .select`${o.id}, ${c.name}, ${i.qty}, ${p.name}`)
 </live-preview>
