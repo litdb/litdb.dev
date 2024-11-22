@@ -28,7 +28,7 @@ const q = $.from(c)
     .select`
         ${c.id}, 
         ${c.name}, 
-        ${o.createdAt} AS recentOrder, 
+        ${o.createdAt}, 
         (${last30Days}) AS last30Days,
         (${totalOrders}) AS totalOrders`
     .orderBy`last30Days DESC`
