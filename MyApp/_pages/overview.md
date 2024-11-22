@@ -95,7 +95,7 @@ db.one($.from(Contact).where`name = ${bobbyTables}`)
 db.one`SELECT * FROM Contact WHERE name = ${bobbyTables}`
 db.one($`SELECT * FROM Contact WHERE name = ${bobbyTables}`)
 db.one($.sql('SELECT * FROM Contact WHERE name = $bobbyTables', { bobbyTables }))
-db.one({ sql:'SELECT * FROM Contact WHERE name=$bobbyTables',params:{bobbyTables} })
+db.one({ sql:'SELECT * FROM Contact WHERE name = $bobbyTables', params:{bobbyTables} })
 </live-preview>
 
 ## Portable
