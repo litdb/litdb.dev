@@ -324,7 +324,7 @@ db.one($.from(Contact).where`name = ${bobbyTables}`)
 db.one`SELECT * FROM Contact WHERE name = ${bobbyTables}`
 db.one($`SELECT * FROM Contact WHERE name = ${bobbyTables}`)
 db.one($.sql('SELECT * FROM Contact WHERE name = $bobbyTables', { bobbyTables }))
-db.one({ sql:'SELECT * FROM Contact WHERE name=$bobbyTables',params:{bobbyTables} })
+db.one({ sql:'SELECT * FROM Contact WHERE name = $bobbyTables', params:{bobbyTables} })
 </live-preview>
 <h2 id="portable">Portable<a class="header-anchor" href="javascript:;" onclick="location.hash='#portable'" aria-label="Permalink">&ZeroWidthSpace;</a></h2>
 <p>litdb is designed to be portable where in most cases query builders, expressions and driver APIs that stick to ANSI SQL
