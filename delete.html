@@ -258,7 +258,7 @@ Home                                    </span>
                     <h2 id="simple-delete">Simple DELETE<a class="header-anchor" href="javascript:;" onclick="location.hash='#simple-delete'" aria-label="Permalink">&ZeroWidthSpace;</a></h2>
 <p>Delete an entity using the <code>db.delete</code> driver method:</p>
 <live-preview>
-db.delete(new Contact({ name:'John', email:'john@email.com', age:27 }))
+db.delete(new Contact({ id:1, name:'John', email:'john@email.com', age:27 }))
 </live-preview>
 <h2 id="delete-query-builder">DELETE Query Builder<a class="header-anchor" href="javascript:;" onclick="location.hash='#delete-query-builder'" aria-label="Permalink">&ZeroWidthSpace;</a></h2>
 <p>When a custom query is needed you can use <code>$.deleteFrom()</code> to create a DELETE query builder:</p>
