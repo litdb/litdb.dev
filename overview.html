@@ -311,7 +311,7 @@ type Changes = { changes: number; lastInsertRowid: number | bigint }
 <a href="/models">data models</a> which are simple TypeScript classes that represent and map 1:1 to tables in a database.</p>
 <h2 id="safe-by-default">Safe by default<a class="header-anchor" href="javascript:;" onclick="location.hash='#safe-by-default'" aria-label="Permalink">&ZeroWidthSpace;</a></h2>
 <p>All SQL Queries and SQL Fragments require using a tagged template function which parameterizes all values to prevent
-SQL Injection attacks, accidentally using a <code>string</code> will result in an error, e.g:</p>
+SQL Injection attacks, as such accidentally using a <code>string</code> will result in an error, e.g:</p>
 <live-preview>
 const bobbyTables = "Robert'); DROP TABLE Students;--"
 db.one(`SELECT * FROM Contact WHERE name = '${bobbyTables}'`)
@@ -319,6 +319,7 @@ db.one(`SELECT * FROM Contact WHERE name = '${bobbyTables}'`)
 <p>Driver APIs, SQL Builders and Expressions instead accept templated strings which auto parameterizes SQL queries:</p>
 <live-preview>
 const bobbyTables = "Robert'); DROP TABLE Students;--"
+db.one($.from(Contact).where(c => $`${c.name} = ${bobbyTables}`))
 db.one($.from(Contact).where`name = ${bobbyTables}`)
 db.one`SELECT * FROM Contact WHERE name = ${bobbyTables}`
 db.one($`SELECT * FROM Contact WHERE name = ${bobbyTables}`)

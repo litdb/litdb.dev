@@ -1,5 +1,6 @@
 // Use external aliased table references across multiple query builders
-const [ c, o ] = [ $.ref(Contact,'c'), $.ref(Order,'o') ]
+const c = $.ref(Contact,'c'),
+      o = $.ref(Order,'o')
 
 const now = new Date()
 const monthAgo = new Date(now.setDate(now.getDate()-30)).toISOString().split('T')[0]
