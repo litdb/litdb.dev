@@ -25,12 +25,11 @@ const totalOrders = $`SELECT SUM(${o4.total})
 const q = $.from(c)
     .join(o, $`${c.id} = ${o.contactId}`)
     .where`${o.createdAt} = (${recentOrder})`
-    .select`
-        ${c.id}, 
-        ${c.name}, 
-        ${o.createdAt}, 
-        (${last30Days}) AS last30Days,
-        (${totalOrders}) AS totalOrders`
+    .select`${c.id}, 
+       ${c.name}, 
+       ${o.createdAt}, 
+       (${last30Days}) AS last30Days,
+       (${totalOrders}) AS totalOrders`
     .orderBy`last30Days DESC`
 
 db.all(q)
