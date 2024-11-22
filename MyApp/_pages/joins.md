@@ -46,9 +46,9 @@ Each joined table can be assigned an alias using the `as` option. This alias is 
 
 <live-preview>
 $.from(Order,'o')
-  .leftJoin(Contact, { on:(o,c) => $`${o.contactId} = ${c.id}`, as:'c' })
-  .join(OrderItem, { on:(_,i,o) => $`${i.orderId} = ${o.id}`, as:'i' })
-  .leftJoin(Product, { on:(i,p) => $`${i.sku} = ${p.sku}`, as:'p' })
+  .leftJoin(Contact, { as:'c', on:(o,c) => $`${o.contactId} = ${c.id}` })
+  .join(OrderItem,   { as:'i', on:(_,i,o) => $`${i.orderId} = ${o.id}` })
+  .leftJoin(Product, { as:'p', on:(i,p) => $`${i.sku} = ${p.sku}` })
   .where((o,c,i,p) => $`${c.id} = ${1} AND ${p.cost} > ${100}`)
   .select((o,c,i,p) => $`${o.id}, ${c.name}, ${i.qty}, ${p.name}`)
 </live-preview>
