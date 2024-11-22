@@ -78,8 +78,8 @@ litdb is more a lightweight data mapper than a full-fledged ORM, but many of its
 
 ## Safe by default
 
-All SQL Queries and SQL Fragments require using a tagged template function which parameterizes all values to prevent 
-SQL Injection attacks, as such accidentally using a `string` will result in an error, e.g:
+All SQL Queries and SQL Fragments require using a tagged template function or SQL Builder which parameterizes 
+all values to prevent SQL Injection attacks, as such accidentally using a `string` will result in an error, e.g:
 
 <live-preview>
 const bobbyTables = "Robert'); DROP TABLE Students;--"
@@ -109,5 +109,5 @@ App to easily migrate to run on different databases.
 
 At the same time litdb SQL Builders and Fragments doesn't restrict you to a subset of SQL, instead of forcing the use of
 a more restrictive query language that abstracts away the full power of SQL, litdb's SQL Builders are designed for creating
-type-safe parameterized SQL that can be executed on any RDBMS, but when needed you can use the full expressiveness of 
-your RDBMS SQL dialect to make use of RDBMS-specific features.
+type-safe parameterized SQL that can be executed on any RDBMS, but when needed you can use the full feature-set of 
+your RDBMS SQL dialect to make use of any RDBMS-specific features.

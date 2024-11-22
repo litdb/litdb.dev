@@ -71,9 +71,9 @@ end or any part of a string.
 
 <live-preview>
 $.from(Contact).where({ 
-    startsWith: { name:'J' }, 
+    startsWith: { city:'A' }, 
     contains: { email:'@gmail.' }, 
-    endsWith: { city:'A' }, 
+    endsWith: { name:'J' }, 
 })
 </live-preview>
 
@@ -93,5 +93,5 @@ $.from(Contact).where({
 Calling `where` with no arguments will reset the WHERE clause:
 
 <live-preview>
-$.from(Contact).where`name LIKE ${'John%'}`.where()
+$.from(Contact).where`name LIKE ${'John%'}`.where().and`id = ${1}`
 </live-preview>
