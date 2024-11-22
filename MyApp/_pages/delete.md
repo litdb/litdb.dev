@@ -7,7 +7,7 @@ title: DELETE Examples
 Delete an entity using the `db.delete` driver method:
 
 <live-preview>
-db.delete(new Contact({ name:'John', email:'john@email.com', age:27 }))
+db.delete(new Contact({ id:1, name:'John', email:'john@email.com', age:27 }))
 </live-preview>
 
 ## DELETE Query Builder
