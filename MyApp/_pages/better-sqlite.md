@@ -5,7 +5,7 @@ title: litdb for Node.js better-sqlite3
 Use litdb with the [better-sqlite3 driver](https://github.com/WiseLibs/better-sqlite3) (requires Node.js):
 
 :::sh
-bun install @litdb/better-sqlite
+npm install @litdb/better-sqlite
 :::
 
 ## Configuration
