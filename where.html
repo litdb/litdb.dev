@@ -307,9 +307,9 @@ db.all($.from(Contact).where({ op: ['>=', { id:10, age:18 }] }))
 end or any part of a string.</p>
 <live-preview>
 $.from(Contact).where({ 
-    startsWith: { name:'J' }, 
+    startsWith: { city:'A' }, 
     contains: { email:'@gmail.' }, 
-    endsWith: { city:'A' }, 
+    endsWith: { name:'J' }, 
 })
 </live-preview>
 <h3 id="null-check-convenience-options">NULL check convenience options<a class="header-anchor" href="javascript:;" onclick="location.hash='#null-check-convenience-options'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
@@ -323,7 +323,7 @@ $.from(Contact).where({
 <h2 id="reset-where">Reset WHERE<a class="header-anchor" href="javascript:;" onclick="location.hash='#reset-where'" aria-label="Permalink">&ZeroWidthSpace;</a></h2>
 <p>Calling <code>where</code> with no arguments will reset the WHERE clause:</p>
 <live-preview>
-$.from(Contact).where`name LIKE ${'John%'}`.where()
+$.from(Contact).where`name LIKE ${'John%'}`.where().and`id = ${1}`
 </live-preview>
 
                 </div>
