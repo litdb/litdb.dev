@@ -260,6 +260,19 @@ Home                                    </span>
 </div>
 <h2 id="create-table">Create Table<a class="header-anchor" href="javascript:;" onclick="location.hash='#create-table'" aria-label="Permalink">&ZeroWidthSpace;</a></h2>
 <live-preview>
+class Freight {
+  id = 0
+  name = ''
+  cost = 0.0
+}
+Table(Freight, {
+  columns: {
+    id: { type:'INTEGER', autoIncrement:true },
+    name: { type:'TEXT', required:true, unique:true, index:true },
+    cost: { type:'MONEY', required:true }
+  }
+})
+db.createTable(Freight)
 db.createTable(Contact)
 db.createTable(Order)
 db.createTable(OrderItem)
