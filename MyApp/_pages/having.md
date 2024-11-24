@@ -24,7 +24,7 @@ const q = $.from(Contact)
     .groupBy(c => $`${c.city}`)
     .select(c => $`${c.city}, COUNT(${c.id})`)
     
-db.all(q.clone().having((c,o) => $`COUNT(${c.id}) > 5  AND SUM(${o.total}) < 1000`))
+db.all(q.clone().having((c,o) => $`COUNT(${c.id}) > 5 AND SUM(${o.total}) < 1000`))
 db.all(q.clone()
     .having(c => $`COUNT(${c.id}) > 5`).having((_,o) => $`SUM(${o.total}) < 1000`))
 </live-preview>
