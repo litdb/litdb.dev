@@ -352,7 +352,7 @@ const { sql, params } = $.from(Contact).select(c =&gt; $`${c.name}`).build()
 <a href="https://github.com/litdb/litdb/discussions/categories/ideas">GitHub Discussions</a>.</p>
 <h2 id="driver-usage">Driver Usage<a class="header-anchor" href="javascript:;" onclick="location.hash='#driver-usage'" aria-label="Permalink">&ZeroWidthSpace;</a></h2>
 <p>litdb drivers are lightweight data adapters providing convenience APIs for executing SQL and parameters.
-They can be used with our without litdb SQL Builders, but offer the most value when used together.</p>
+They can be used with or without litdb SQL Builders, but offer the most value when used together.</p>
 <p>The same APIs are available across all drivers, so you can easily switch between them. They include both <strong>sync</strong> APIs
 recommended for SQLite libraries that use SQLite's native blocking APIs, whilst <strong>async</strong> APIs should be used for
 querying all other remote databases, e.g. PostgreSQL and MySQL.</p>
