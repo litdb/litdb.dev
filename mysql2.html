@@ -279,7 +279,7 @@ export const connection = connect({ hostname, database, user, password })
 export const { $, async:db, native:sql } = connection
 </code></pre>
 <div class="tip custom-block">
-            <p class="custom-block-title">TIP</p><p>When needed use <code>sql</code> to access the native <a href="https://github.com/porsager/postgres#usage">postgres.js sql function</a></p>
+            <p class="custom-block-title">TIP</p><p>When needed use <code>native</code> to access <a href="https://sidorares.github.io/node-mysql2/docs#using-connection-pools">mysql2 Connection Pool</a></p>
 </div>
 <h3 id="configuration-options">Configuration Options<a class="header-anchor" href="javascript:;" onclick="location.hash='#configuration-options'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
 <pre><code class="language-ts">type ConnectionOptions = {
