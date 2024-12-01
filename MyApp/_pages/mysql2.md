@@ -22,7 +22,7 @@ export const { $, async:db, native:sql } = connection
 ```
 
 :::tip
-When needed use `sql` to access the native [postgres.js sql function](https://github.com/porsager/postgres#usage)
+When needed use `native` to access [mysql2 Connection Pool](https://sidorares.github.io/node-mysql2/docs#using-connection-pools)
 :::
 
 ### Configuration Options
