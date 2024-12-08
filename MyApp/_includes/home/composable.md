@@ -6,11 +6,13 @@ const hasPurchasesOver = (c,total) => $`EXISTS (
 const inCity = (...cities) => c => $`${c.city} IN (${cities})`
 const createdAfter = after => $.sql('createdAt >= $after', { after })
 const olderThan = age => ({ sql:'age >= $age', params: { age } })
+const eq = (ref, value) => x => $`${ref(x)} = ${value}`
 const q = $.from(Contact,'c')
     .where(c => hasPurchasesOver(c,1000))
     .and(inCity('Austin','Chicago'))
     .and(createdAfter(new Date('2024-01-01')))
     .and(olderThan(18))
+	.and(eq(c => c.id, 10))
     .and({ contains: { name:'John' } })
 db.all(q)
 </live-preview>
