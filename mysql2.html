@@ -258,7 +258,7 @@ Home                                    </span>
                     <p>Use litdb with <a href="https://github.com/sidorares/node-mysql2">node-mysql2</a> driver:</p>
 <div class="not-prose sh-copy cp flex cursor-pointer mb-3" onclick="copy(this)">
                 <div class="flex-grow bg-gray-800">
-                    <div class="pl-4 py-1 pb-1.5 align-middle whitespace-pre text-base text-gray-100"><p>npm install @litdb/postgres</p>
+                    <div class="pl-4 py-1 pb-1.5 align-middle whitespace-pre text-base text-gray-100"><p>npm install @litdb/mysql2</p>
 </div>
                     </div>
                 <div class="flex">
@@ -316,7 +316,7 @@ export const { $, async:db, native:sql } = connection
 connection = connect(connectionString)
 </code></pre>
 <h2 id="usage">Usage<a class="header-anchor" href="javascript:;" onclick="location.hash='#usage'" aria-label="Permalink">&ZeroWidthSpace;</a></h2>
-<p>Example of using <code>@litdb/postgres</code> async APIs:</p>
+<p>Example of using <code>@litdb/mysql2</code> async APIs:</p>
 <pre><code class="language-ts">import { $, db } from &quot;./db&quot;
 import { Contact } from &quot;./models&quot;
 
