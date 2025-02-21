@@ -5,7 +5,7 @@ title: litdb for mysql2
 Use litdb with [node-mysql2](https://github.com/sidorares/node-mysql2) driver:
 
 :::sh
-npm install @litdb/postgres
+npm install @litdb/mysql2
 :::
 
 ## Configuration
@@ -68,7 +68,7 @@ connection = connect(connectionString)
 
 ## Usage
 
-Example of using `@litdb/postgres` async APIs:
+Example of using `@litdb/mysql2` async APIs:
 
 ```ts
 import { $, db } from "./db"
